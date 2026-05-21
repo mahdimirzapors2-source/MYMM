@@ -18,6 +18,8 @@ jobs:
         with:
           node-version: '20'
       - name: Build VPN and Start Server
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cat > index.html << 'HTMLEND'
           <!DOCTYPE html>
@@ -59,7 +61,6 @@ jobs:
               document.getElementById('status').innerHTML = '✅ Token saved';
             };
 
-            // دریافت توکن از صفحه اصلی
             window.addEventListener('message', e => {
               if (e.data?.type === 'setToken' && e.data?.token) {
                 TOKEN = e.data.token;
@@ -112,13 +113,10 @@ jobs:
               }
 
               const uuid = generateUUID();
-              document.getElementById('status').innerHTML =
-                `⏳ درخواست <span class="loading-dot"></span> (ID: ${uuid.slice(0, 8)})`;
-              document.getElementById('content').innerHTML =
-                '<div style="text-align:center;padding:40px;color:#8b949e">⏳ در حال ارسال درخواست...</div>';
+              document.getElementById('status').innerHTML = `⏳ درخواست <span class="loading-dot"></span> (ID: ${uuid.slice(0, 8)})`;
+              document.getElementById('content').innerHTML = '<div style="text-align:center;padding:40px;color:#8b949e">⏳ در حال ارسال درخواست...</div>';
 
               try {
-                // ایجاد فایل درخواست
                 const reqData = { url: url, method: 'GET', timestamp: Date.now() };
                 const reqBody = {
                   message: `Request ${uuid}`,
@@ -126,10 +124,8 @@ jobs:
                   branch: 'main'
                 };
                 await apiCall('PUT', `req_${uuid}.json`, reqBody);
-                document.getElementById('status').innerHTML =
-                  `⏳ منتظر پاسخ سرور (ID: ${uuid.slice(0, 8)})...`;
+                document.getElementById('status').innerHTML = `⏳ منتظر پاسخ سرور (ID: ${uuid.slice(0, 8)})...`;
 
-                // منتظر فایل پاسخ
                 let responseData = null;
                 for (let i = 0; i < 150; i++) {
                   await new Promise(r => setTimeout(r, 2000));
@@ -138,7 +134,6 @@ jobs:
                     const decoded = atob(resFile.content);
                     responseData = JSON.parse(decoded);
                     if (responseData.status === 'done' || responseData.status === 'error') {
-                      // پاکسازی فایل پاسخ
                       try {
                         await apiCall('DELETE', `res_${uuid}.json`, {
                           message: `Cleanup ${uuid}`,
@@ -148,22 +143,15 @@ jobs:
                       } catch (e) {}
                       break;
                     }
-                  } catch (e) {
-                    // فایل هنوز آماده نیست
-                  }
+                  } catch (e) {}
                   if (i % 10 === 9) {
-                    document.getElementById('status').innerHTML =
-                      `⏳ هنوز منتظریم... (${Math.round((i + 1) * 2)} ثانیه)`;
+                    document.getElementById('status').innerHTML = `⏳ هنوز منتظریم... (${Math.round((i + 1) * 2)} ثانیه)`;
                   }
                 }
 
                 if (!responseData) throw new Error('Timeout - سرور پاسخ نداد');
+                if (responseData.status === 'error') throw new Error(responseData.error || 'Unknown error');
 
-                if (responseData.status === 'error') {
-                  throw new Error(responseData.error || 'Unknown error');
-                }
-
-                // نمایش پاسخ
                 const bytes = Uint8Array.from(atob(responseData.body), c => c.charCodeAt(0));
                 const blob = new Blob([bytes], { type: responseData.type || 'text/plain' });
                 const blobUrl = URL.createObjectURL(blob);
@@ -171,20 +159,16 @@ jobs:
 
                 if (contentType.includes('html')) {
                   const text = new TextDecoder().decode(bytes);
-                  document.getElementById('content').innerHTML =
-                    '<iframe srcdoc="' + escapeHtml(text) + '"></iframe>';
+                  document.getElementById('content').innerHTML = '<iframe srcdoc="' + escapeHtml(text) + '"></iframe>';
                 } else if (contentType.includes('video')) {
-                  document.getElementById('content').innerHTML =
-                    '<video controls autoplay src="' + blobUrl + '"></video>';
+                  document.getElementById('content').innerHTML = '<video controls autoplay src="' + blobUrl + '"></video>';
                 } else if (contentType.includes('image')) {
-                  document.getElementById('content').innerHTML =
-                    '<img src="' + blobUrl + '" style="max-width:100%;border-radius:8px">';
+                  document.getElementById('content').innerHTML = '<img src="' + blobUrl + '" style="max-width:100%;border-radius:8px">';
                 } else if (contentType.includes('json') || contentType.includes('javascript')) {
                   const text = new TextDecoder().decode(bytes);
                   try {
                     const parsed = JSON.parse(text);
-                    document.getElementById('content').innerHTML =
-                      '<pre>' + escapeHtml(JSON.stringify(parsed, null, 2)) + '</pre>';
+                    document.getElementById('content').innerHTML = '<pre>' + escapeHtml(JSON.stringify(parsed, null, 2)) + '</pre>';
                   } catch {
                     document.getElementById('content').innerHTML = '<pre>' + escapeHtml(text) + '</pre>';
                   }
@@ -193,13 +177,10 @@ jobs:
                   document.getElementById('content').innerHTML = '<pre>' + escapeHtml(text) + '</pre>';
                 }
 
-                document.getElementById('status').innerHTML =
-                  `✅ انجام شد - ${responseData.statusCode || 200} | ${new Date().toLocaleTimeString()}`;
+                document.getElementById('status').innerHTML = `✅ انجام شد - ${responseData.statusCode || 200} | ${new Date().toLocaleTimeString()}`;
               } catch (e) {
                 document.getElementById('status').innerHTML = '❌ خطا: ' + e.message;
-                document.getElementById('content').innerHTML =
-                  '<div style="text-align:center;padding:40px;color:#f85149">❌ ' + escapeHtml(e.message) +
-                  '</div>';
+                document.getElementById('content').innerHTML = '<div style="text-align:center;padding:40px;color:#f85149">❌ ' + escapeHtml(e.message) + '</div>';
               }
             }
 
@@ -306,8 +287,7 @@ jobs:
                 });
               });
               req.on('error', reject);
-              req.on('timeout', () => { req.destroy();
-                reject(new Error('Timeout')); });
+              req.on('timeout', () => { req.destroy(); reject(new Error('Timeout')); });
               req.end();
             });
           }
@@ -316,17 +296,10 @@ jobs:
             console.log('🟢 VPN Server started - polling for requests...');
             while (true) {
               try {
-                // دریافت لیست فایل‌ها
                 const files = await apiGet('');
-                if (!Array.isArray(files)) {
-                  console.log('⚠️ Unexpected API response, retrying...');
-                  await sleep(5000);
-                  continue;
-                }
+                if (!Array.isArray(files)) { await sleep(5000); continue; }
 
-                // پیدا کردن فایل‌های درخواست
                 const reqFiles = files.filter(f => f.name.startsWith('req_') && f.name.endsWith('.json'));
-
                 if (reqFiles.length > 0) {
                   console.log(`📋 Found ${reqFiles.length} pending request(s)`);
                 }
@@ -334,16 +307,13 @@ jobs:
                 for (const reqFile of reqFiles) {
                   const uuid = reqFile.name.replace('req_', '').replace('.json', '');
                   try {
-                    // خواندن محتوای درخواست
                     const reqFileData = await apiGet(`req_${uuid}.json`);
                     const decoded = Buffer.from(reqFileData.content, 'base64').toString('utf-8');
                     const reqData = JSON.parse(decoded);
                     console.log(`🔄 Processing ${uuid.slice(0, 8)}: ${reqData.url}`);
 
-                    // دریافت URL
                     const response = await fetchUrl(reqData.url);
 
-                    // نوشتن پاسخ
                     const resContent = JSON.stringify({
                       status: 'done',
                       body: response.body,
@@ -353,7 +323,6 @@ jobs:
                       timestamp: Date.now()
                     });
 
-                    // بررسی وجود فایل پاسخ قبلی
                     let resSha = null;
                     try {
                       const existing = await apiGet(`res_${uuid}.json`);
@@ -363,12 +332,10 @@ jobs:
                     await apiPut(`res_${uuid}.json`, resContent, `Response for ${uuid}`, resSha);
                     console.log(`✅ Response written for ${uuid.slice(0, 8)}`);
 
-                    // حذف فایل درخواست
                     await apiDelete(`req_${uuid}.json`, reqFileData.sha, `Processed ${uuid}`);
                     console.log(`🗑️ Request file deleted: ${uuid.slice(0, 8)}`);
                   } catch (e) {
                     console.error(`❌ Error processing ${uuid.slice(0, 8)}:`, e.message);
-                    // نوشتن پاسخ خطا
                     try {
                       const errContent = JSON.stringify({
                         status: 'error',
@@ -376,10 +343,7 @@ jobs:
                         timestamp: Date.now()
                       });
                       let resSha = null;
-                      try {
-                        const existing = await apiGet(`res_${uuid}.json`);
-                        resSha = existing.sha;
-                      } catch (e2) {}
+                      try { const existing = await apiGet(`res_${uuid}.json`); resSha = existing.sha; } catch (e2) {}
                       await apiPut(`res_${uuid}.json`, errContent, `Error for ${uuid}`, resSha);
                       await apiDelete(`req_${uuid}.json`, reqFile.sha, `Error ${uuid}`);
                     } catch (e2) {
@@ -388,7 +352,6 @@ jobs:
                   }
                 }
 
-                // پاکسازی فایل‌های پاسخ قدیمی (بیشتر از ۱۰ دقیقه)
                 const now = Date.now();
                 const resFiles = files.filter(f => f.name.startsWith('res_') && f.name.endsWith('.json'));
                 for (const resFile of resFiles) {
@@ -400,9 +363,7 @@ jobs:
                       await apiDelete(resFile.name, resData.sha, 'Cleanup old response');
                       console.log(`🧹 Cleaned up old response: ${resFile.name}`);
                     }
-                  } catch (e) {
-                    // نادیده گرفتن خطاهای پاکسازی
-                  }
+                  } catch (e) {}
                 }
               } catch (e) {
                 console.error('🔄 Loop error:', e.message);
@@ -420,5 +381,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add . && git commit -m "VPN setup" || true
+          git pull --rebase https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name || 'main' }} || true
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name || 'main' }} || true
           node server.js
