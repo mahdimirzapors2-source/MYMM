@@ -55,10 +55,18 @@ jobs:
             let TOKEN = localStorage.getItem('vpn_token') || '';
             document.getElementById('token').value = TOKEN;
 
+            function logToParent(msg, level='info'){
+              try{ window.parent.postMessage({type:'vpn-log', message:msg, level:level}, '*'); }catch(e){}
+              console.log(msg);
+            }
+
+            logToParent('VPN iframe loaded. Token from localStorage: ' + (TOKEN ? 'yes' : 'no'));
+
             document.getElementById('saveToken').onclick = () => {
               TOKEN = document.getElementById('token').value.trim();
               localStorage.setItem('vpn_token', TOKEN);
               document.getElementById('status').innerHTML = '✅ Token saved';
+              logToParent('Token saved in iframe');
             };
 
             window.addEventListener('message', e => {
@@ -67,6 +75,7 @@ jobs:
                 document.getElementById('token').value = TOKEN;
                 localStorage.setItem('vpn_token', TOKEN);
                 document.getElementById('status').innerHTML = '✅ Token received from main page';
+                logToParent('Token received from main page');
               }
               if (e.data?.type === 'navigate') {
                 document.getElementById('url').value = e.data.url;
@@ -94,7 +103,10 @@ jobs:
               }
               const res = await fetch(url, opts);
               const data = await res.json();
-              if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+              if (!res.ok) {
+                logToParent(`apiCall error: ${data.message || 'Unknown'}`, 'error');
+                throw new Error(data.message || `HTTP ${res.status}`);
+              }
               return data;
             }
 
@@ -105,6 +117,7 @@ jobs:
             async function fetchPage(url) {
               if (!TOKEN) {
                 document.getElementById('status').innerHTML = '❌ توکن را وارد کنید';
+                logToParent('fetchPage: no token', 'error');
                 return;
               }
               if (!url.startsWith('http')) {
@@ -113,8 +126,10 @@ jobs:
               }
 
               const uuid = generateUUID();
-              document.getElementById('status').innerHTML = `⏳ درخواست <span class="loading-dot"></span> (ID: ${uuid.slice(0, 8)})`;
+              document.getElementById('status').innerHTML = `⏳ درخواست ${uuid.slice(0,8)}`;
               document.getElementById('content').innerHTML = '<div style="text-align:center;padding:40px;color:#8b949e">⏳ در حال ارسال درخواست...</div>';
+
+              logToParent(`Starting request ${uuid.slice(0,8)} for ${url}`);
 
               try {
                 const reqData = { url: url, method: 'GET', timestamp: Date.now() };
@@ -123,8 +138,9 @@ jobs:
                   content: btoa(unescape(encodeURIComponent(JSON.stringify(reqData)))),
                   branch: 'main'
                 };
+                logToParent(`Creating req file req_${uuid}.json`);
                 await apiCall('PUT', `req_${uuid}.json`, reqBody);
-                document.getElementById('status').innerHTML = `⏳ منتظر پاسخ سرور (ID: ${uuid.slice(0, 8)})...`;
+                logToParent(`Request file created, waiting for response...`);
 
                 let responseData = null;
                 for (let i = 0; i < 150; i++) {
@@ -133,6 +149,7 @@ jobs:
                     const resFile = await apiCall('GET', `res_${uuid}.json`);
                     const decoded = atob(resFile.content);
                     responseData = JSON.parse(decoded);
+                    logToParent(`Poll ${i+1}: got response file, status: ${responseData.status}`);
                     if (responseData.status === 'done' || responseData.status === 'error') {
                       try {
                         await apiCall('DELETE', `res_${uuid}.json`, {
@@ -140,16 +157,24 @@ jobs:
                           sha: resFile.sha,
                           branch: 'main'
                         });
-                      } catch (e) {}
+                        logToParent('Response file deleted');
+                      } catch (e) {
+                        logToParent('Failed to delete response file: ' + e.message, 'warn');
+                      }
                       break;
                     }
-                  } catch (e) {}
+                  } catch (e) {
+                    // file not ready yet
+                  }
                   if (i % 10 === 9) {
-                    document.getElementById('status').innerHTML = `⏳ هنوز منتظریم... (${Math.round((i + 1) * 2)} ثانیه)`;
+                    logToParent(`Still waiting... (${Math.round((i+1)*2)}s)`);
                   }
                 }
 
-                if (!responseData) throw new Error('Timeout - سرور پاسخ نداد');
+                if (!responseData) {
+                  logToParent('Timeout after 5 minutes', 'error');
+                  throw new Error('Timeout - سرور پاسخ نداد');
+                }
                 if (responseData.status === 'error') throw new Error(responseData.error || 'Unknown error');
 
                 const bytes = Uint8Array.from(atob(responseData.body), c => c.charCodeAt(0));
@@ -177,10 +202,12 @@ jobs:
                   document.getElementById('content').innerHTML = '<pre>' + escapeHtml(text) + '</pre>';
                 }
 
-                document.getElementById('status').innerHTML = `✅ انجام شد - ${responseData.statusCode || 200} | ${new Date().toLocaleTimeString()}`;
+                document.getElementById('status').innerHTML = `✅ ${responseData.statusCode || 200}`;
+                logToParent('Page loaded successfully', 'success');
               } catch (e) {
                 document.getElementById('status').innerHTML = '❌ خطا: ' + e.message;
                 document.getElementById('content').innerHTML = '<div style="text-align:center;padding:40px;color:#f85149">❌ ' + escapeHtml(e.message) + '</div>';
+                logToParent('Error: ' + e.message, 'error');
               }
             }
 
@@ -190,9 +217,10 @@ jobs:
             });
 
             if (TOKEN) {
-              document.getElementById('status').innerHTML = '✅ آماده - توکن ذخیره شده است';
+              logToParent('Auto-navigating to google.com');
+              fetchPage('https://google.com');
             } else {
-              document.getElementById('status').innerHTML = '⚠️ لطفاً توکن را وارد کنید';
+              logToParent('No token stored, waiting for user input');
             }
           </script>
           </body>
@@ -310,7 +338,7 @@ jobs:
                     const reqFileData = await apiGet(`req_${uuid}.json`);
                     const decoded = Buffer.from(reqFileData.content, 'base64').toString('utf-8');
                     const reqData = JSON.parse(decoded);
-                    console.log(`🔄 Processing ${uuid.slice(0, 8)}: ${reqData.url}`);
+                    console.log(`🔄 Processing ${uuid.slice(0,8)}: ${reqData.url}`);
 
                     const response = await fetchUrl(reqData.url);
 
@@ -330,12 +358,12 @@ jobs:
                     } catch (e) {}
 
                     await apiPut(`res_${uuid}.json`, resContent, `Response for ${uuid}`, resSha);
-                    console.log(`✅ Response written for ${uuid.slice(0, 8)}`);
+                    console.log(`✅ Response written for ${uuid.slice(0,8)}`);
 
                     await apiDelete(`req_${uuid}.json`, reqFileData.sha, `Processed ${uuid}`);
-                    console.log(`🗑️ Request file deleted: ${uuid.slice(0, 8)}`);
+                    console.log(`🗑️ Request file deleted: ${uuid.slice(0,8)}`);
                   } catch (e) {
-                    console.error(`❌ Error processing ${uuid.slice(0, 8)}:`, e.message);
+                    console.error(`❌ Error processing ${uuid.slice(0,8)}:`, e.message);
                     try {
                       const errContent = JSON.stringify({
                         status: 'error',
@@ -361,7 +389,6 @@ jobs:
                     const parsed = JSON.parse(decoded);
                     if (parsed.timestamp && (now - parsed.timestamp) > 600000) {
                       await apiDelete(resFile.name, resData.sha, 'Cleanup old response');
-                      console.log(`🧹 Cleaned up old response: ${resFile.name}`);
                     }
                   } catch (e) {}
                 }
