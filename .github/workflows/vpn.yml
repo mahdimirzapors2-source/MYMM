@@ -1,0 +1,344 @@
+name: "VPN"
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vpn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build VPN and Start Server
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # حذف فایل‌های قدیمی
+          rm -f index.html server.js req.json res.json
+          git rm --cached index.html server.js req.json res.json 2>/dev/null || true
+          git commit -m "Remove old VPN files" || true
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name || 'main' }} --force || true
+
+          cat > index.html << 'HTMLEND'
+          <!DOCTYPE html>
+          <html>
+          <head>
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>VPN</title>
+          <style>
+          *{margin:0;padding:0;box-sizing:border-box}
+          body{background:#0d1117;color:#fff;font-family:system-ui;padding:16px}
+          input,button{padding:12px;margin:5px;border-radius:8px;font-size:14px}
+          input{flex:1;background:#1f242f;border:1px solid #3d444d;color:#fff}
+          button{background:#238636;border:none;color:#fff;font-weight:bold;cursor:pointer}
+          button:active{opacity:0.8}
+          .token-bar{display:flex;margin-bottom:12px}
+          .url-bar{display:flex;margin-bottom:12px}
+          .content{background:#161b22;border-radius:16px;padding:16px;min-height:400px;overflow:auto;word-break:break-all}
+          .status{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(0,0,0,0.85);padding:10px 16px;border-radius:20px;font-size:11px;text-align:center;z-index:10}
+          iframe{width:100%;height:500px;border:none;border-radius:8px}
+          video{max-width:100%;border-radius:8px}
+          pre{white-space:pre-wrap;word-break:break-all;font-size:12px;line-height:1.5}
+          .loading-dot{display:inline-block;width:10px;height:10px;background:#58a6ff;border-radius:50%;animation:pulse 1s infinite;margin-left:4px}
+          @keyframes pulse{0%,100%{opacity:0.3}50%{opacity:1}}
+          </style>
+          </head>
+          <body>
+          <div class="token-bar"><input type="password" id="token" placeholder="GitHub token"><button id="saveToken">💾 ذخیره</button></div>
+          <div class="url-bar"><input id="url" placeholder="https://google.com" value="https://google.com"><button id="go">🌐 برو</button></div>
+          <div class="content" id="content"><div style="text-align:center;padding:40px;color:#8b949e">🔗 آماده برای مرور</div></div>
+          <div class="status" id="status">⏳ Ready</div>
+          <script>
+            const REPO = '${{ github.repository }}';
+            let TOKEN = localStorage.getItem('vpn_token') || '';
+            document.getElementById('token').value = TOKEN;
+
+            function logToParent(msg, level='info'){
+              try{ window.parent.postMessage({type:'vpn-log', message:msg, level:level}, '*'); }catch(e){}
+              console.log(msg);
+            }
+
+            logToParent('VPN iframe loaded (raw URL). Token: ' + (TOKEN ? 'yes' : 'no'));
+
+            document.getElementById('saveToken').onclick = () => {
+              TOKEN = document.getElementById('token').value.trim();
+              localStorage.setItem('vpn_token', TOKEN);
+              document.getElementById('status').innerHTML = '✅ Token saved';
+              logToParent('Token saved in iframe');
+            };
+
+            window.addEventListener('message', e => {
+              if (e.data?.type === 'setToken' && e.data?.token) {
+                TOKEN = e.data.token;
+                document.getElementById('token').value = TOKEN;
+                localStorage.setItem('vpn_token', TOKEN);
+                document.getElementById('status').innerHTML = '✅ Token received from main page';
+                logToParent('Token received from main page');
+              }
+              if (e.data?.type === 'navigate') {
+                document.getElementById('url').value = e.data.url;
+                fetchPage(e.data.url);
+              }
+            });
+
+            function generateUUID() {
+              return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                const r = Math.random() * 16 | 0;
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+              });
+            }
+
+            async function apiCall(method, path, body) {
+              const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+              const headers = {
+                'Authorization': `token ${TOKEN}`,
+                'Accept': 'application/vnd.github.v3+json'
+              };
+              const opts = { method, headers };
+              if (body) {
+                headers['Content-Type'] = 'application/json';
+                opts.body = JSON.stringify(body);
+              }
+              const res = await fetch(url, opts);
+              const data = await res.json();
+              if (!res.ok) {
+                logToParent(`apiCall error on ${method} ${path}: ${data.message || 'Unknown'}`, 'error');
+                throw new Error(data.message || `HTTP ${res.status}`);
+              }
+              return data;
+            }
+
+            function escapeHtml(s) {
+              return s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
+            }
+
+            async function fetchPage(url) {
+              if (!TOKEN) {
+                document.getElementById('status').innerHTML = '❌ توکن را وارد کنید';
+                logToParent('fetchPage: no token', 'error');
+                return;
+              }
+              if (!url.startsWith('http')) {
+                url = 'https://' + url;
+                document.getElementById('url').value = url;
+              }
+
+              const uuid = generateUUID();
+              document.getElementById('status').innerHTML = `⏳ ${uuid.slice(0,8)}`;
+              document.getElementById('content').innerHTML = '<div style="text-align:center;padding:40px;color:#8b949e">⏳ در حال ارسال درخواست...</div>';
+
+              logToParent(`Request ${uuid.slice(0,8)}: ${url}`);
+
+              try {
+                const reqData = { url: url, method: 'GET', timestamp: Date.now() };
+                const reqBody = {
+                  message: `Request ${uuid}`,
+                  content: btoa(unescape(encodeURIComponent(JSON.stringify(reqData)))),
+                  branch: 'main'
+                };
+                await apiCall('PUT', `req_${uuid}.json`, reqBody);
+                logToParent(`Request file req_${uuid}.json created`);
+
+                let responseData = null;
+                for (let i = 0; i < 150; i++) {
+                  await new Promise(r => setTimeout(r, 2000));
+                  try {
+                    const resFile = await apiCall('GET', `res_${uuid}.json`);
+                    const decoded = atob(resFile.content);
+                    responseData = JSON.parse(decoded);
+                    if (responseData.status === 'done' || responseData.status === 'error') {
+                      // حذف فایل پاسخ
+                      try {
+                        await apiCall('DELETE', `res_${uuid}.json`, {
+                          message: `Cleanup ${uuid}`,
+                          sha: resFile.sha,
+                          branch: 'main'
+                        });
+                      } catch(e){}
+                      break;
+                    }
+                  } catch(e) {}
+                }
+
+                if (!responseData) throw new Error('Timeout');
+                if (responseData.status === 'error') throw new Error(responseData.error);
+
+                const bytes = Uint8Array.from(atob(responseData.body), c => c.charCodeAt(0));
+                const blob = new Blob([bytes], { type: responseData.type || 'text/plain' });
+                const blobUrl = URL.createObjectURL(blob);
+                const contentType = responseData.type || 'text/plain';
+
+                if (contentType.includes('html')) {
+                  const text = new TextDecoder().decode(bytes);
+                  document.getElementById('content').innerHTML = '<iframe srcdoc="' + escapeHtml(text) + '"></iframe>';
+                } else if (contentType.includes('video')) {
+                  document.getElementById('content').innerHTML = '<video controls autoplay src="' + blobUrl + '"></video>';
+                } else if (contentType.includes('image')) {
+                  document.getElementById('content').innerHTML = '<img src="' + blobUrl + '" style="max-width:100%;border-radius:8px">';
+                } else if (contentType.includes('json') || contentType.includes('javascript')) {
+                  const text = new TextDecoder().decode(bytes);
+                  try {
+                    const parsed = JSON.parse(text);
+                    document.getElementById('content').innerHTML = '<pre>' + escapeHtml(JSON.stringify(parsed, null, 2)) + '</pre>';
+                  } catch {
+                    document.getElementById('content').innerHTML = '<pre>' + escapeHtml(text) + '</pre>';
+                  }
+                } else {
+                  const text = new TextDecoder().decode(bytes);
+                  document.getElementById('content').innerHTML = '<pre>' + escapeHtml(text) + '</pre>';
+                }
+
+                document.getElementById('status').innerHTML = `✅ ${responseData.statusCode || 200}`;
+                logToParent('Page loaded successfully', 'success');
+              } catch(e) {
+                document.getElementById('status').innerHTML = '❌ ' + e.message;
+                document.getElementById('content').innerHTML = '<div style="text-align:center;padding:40px;color:#f85149">❌ ' + escapeHtml(e.message) + '</div>';
+                logToParent('Error: ' + e.message, 'error');
+              }
+            }
+
+            document.getElementById('go').onclick = () => fetchPage(document.getElementById('url').value);
+            document.getElementById('url').addEventListener('keydown', e => {
+              if (e.key === 'Enter') fetchPage(document.getElementById('url').value);
+            });
+
+            if (TOKEN) {
+              fetchPage('https://google.com');
+            }
+          </script>
+          </body>
+          </html>
+          HTMLEND
+
+          cat > server.js << 'SERVEREND'
+          const { execSync } = require('child_process');
+          const http = require('http');
+          const https = require('https');
+          const url = require('url');
+
+          const TOKEN = process.env.GITHUB_TOKEN;
+          const REPO = process.env.GITHUB_REPOSITORY;
+          const BRANCH = process.env.GITHUB_REF_NAME || 'main';
+          const BASE = `https://api.github.com/repos/${REPO}/contents`;
+          const HEADERS = {
+            'Authorization': `token ${TOKEN}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'VPN-Server/1.0'
+          };
+
+          function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+          async function apiGet(path) {
+            const res = await fetch(`${BASE}/${path}`, { headers: HEADERS });
+            if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || `GET ${path}: HTTP ${res.status}`); }
+            return res.json();
+          }
+
+          async function apiPut(path, content, message, sha = null) {
+            const body = { message, content: Buffer.from(content).toString('base64'), branch: BRANCH };
+            if (sha) body.sha = sha;
+            const res = await fetch(`${BASE}/${path}`, {
+              method: 'PUT', headers: { ...HEADERS, 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+            });
+            if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || `PUT ${path}: HTTP ${res.status}`); }
+            return res.json();
+          }
+
+          async function apiDelete(path, sha, message) {
+            const res = await fetch(`${BASE}/${path}`, {
+              method: 'DELETE', headers: { ...HEADERS, 'Content-Type': 'application/json' }, body: JSON.stringify({ message, sha, branch: BRANCH })
+            });
+            if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || `DELETE ${path}: HTTP ${res.status}`); }
+          }
+
+          async function fetchUrl(targetUrl) {
+            const parsed = new url.URL(targetUrl);
+            const mod = parsed.protocol === 'https:' ? https : http;
+            return new Promise((resolve, reject) => {
+              const opts = {
+                hostname: parsed.hostname, port: parsed.port || (parsed.protocol==='https:'?443:80),
+                path: parsed.pathname + parsed.search, method: 'GET',
+                headers: {
+                  'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html,application/xhtml+xml',
+                  'Accept-Language': 'en-US,en;q=0.5'
+                }, timeout: 30000
+              };
+              const req = mod.request(opts, res => {
+                const chunks = [];
+                res.on('data', c => chunks.push(c));
+                res.on('end', () => resolve({
+                  body: Buffer.concat(chunks).toString('base64'),
+                  type: res.headers['content-type'] || 'text/plain',
+                  statusCode: res.statusCode
+                }));
+              });
+              req.on('error', reject);
+              req.on('timeout', () => { req.destroy(); reject(new Error('Timeout')); });
+              req.end();
+            });
+          }
+
+          async function loop() {
+            console.log('VPN Server started (UUID version)');
+            while(true) {
+              try {
+                const files = await apiGet('');
+                if (!Array.isArray(files)) { await sleep(5000); continue; }
+                const reqFiles = files.filter(f => f.name.startsWith('req_') && f.name.endsWith('.json'));
+                for (const reqFile of reqFiles) {
+                  const uuid = reqFile.name.replace('req_', '').replace('.json', '');
+                  try {
+                    const reqFileData = await apiGet(`req_${uuid}.json`);
+                    const decoded = Buffer.from(reqFileData.content, 'base64').toString('utf-8');
+                    const reqData = JSON.parse(decoded);
+                    console.log(`Processing ${uuid.slice(0,8)}: ${reqData.url}`);
+                    const response = await fetchUrl(reqData.url);
+                    const resContent = JSON.stringify({ status:'done', body: response.body, type: response.type, statusCode: response.statusCode, timestamp: Date.now() });
+                    let resSha = null;
+                    try { const existing = await apiGet(`res_${uuid}.json`); resSha = existing.sha; } catch(e){}
+                    await apiPut(`res_${uuid}.json`, resContent, `Response for ${uuid}`, resSha);
+                    await apiDelete(`req_${uuid}.json`, reqFileData.sha, `Processed ${uuid}`);
+                  } catch(e) {
+                    console.error(`Error processing ${uuid.slice(0,8)}:`, e.message);
+                    try {
+                      const errContent = JSON.stringify({ status:'error', error: e.message, timestamp: Date.now() });
+                      let resSha = null;
+                      try { const existing = await apiGet(`res_${uuid}.json`); resSha = existing.sha; } catch(e2){}
+                      await apiPut(`res_${uuid}.json`, errContent, `Error for ${uuid}`, resSha);
+                      await apiDelete(`req_${uuid}.json`, reqFile.sha, `Error ${uuid}`);
+                    } catch(e2){}
+                  }
+                }
+                const now = Date.now();
+                const resFiles = files.filter(f => f.name.startsWith('res_') && f.name.endsWith('.json'));
+                for (const resFile of resFiles) {
+                  try {
+                    const resData = await apiGet(resFile.name);
+                    const decoded = Buffer.from(resData.content, 'base64').toString('utf-8');
+                    const parsed = JSON.parse(decoded);
+                    if (parsed.timestamp && (now - parsed.timestamp) > 600000) {
+                      await apiDelete(resFile.name, resData.sha, 'Cleanup old response');
+                    }
+                  } catch(e){}
+                }
+              } catch(e) { console.error('Loop error:', e.message); }
+              await sleep(3000);
+            }
+          }
+          loop().catch(e => { console.error('Fatal error:', e); process.exit(1); });
+          SERVEREND
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html server.js
+          git commit -m "VPN fresh setup (UUID)" || true
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name || 'main' }} --force
+          node server.js
