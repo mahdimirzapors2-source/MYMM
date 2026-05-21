@@ -1,4 +1,3 @@
-const { execSync } = require('child_process');
 const http = require('http');
 const https = require('https');
 const url = require('url');
@@ -17,7 +16,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 async function apiGet(path) {
   const res = await fetch(`${BASE}/${path}`, { headers: HEADERS });
-  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || `GET ${path}: HTTP ${res.status}`); }
+  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message); }
   return res.json();
 }
 
@@ -27,7 +26,7 @@ async function apiPut(path, content, message, sha = null) {
   const res = await fetch(`${BASE}/${path}`, {
     method: 'PUT', headers: { ...HEADERS, 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   });
-  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || `PUT ${path}: HTTP ${res.status}`); }
+  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message); }
   return res.json();
 }
 
@@ -35,7 +34,7 @@ async function apiDelete(path, sha, message) {
   const res = await fetch(`${BASE}/${path}`, {
     method: 'DELETE', headers: { ...HEADERS, 'Content-Type': 'application/json' }, body: JSON.stringify({ message, sha, branch: BRANCH })
   });
-  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message || `DELETE ${path}: HTTP ${res.status}`); }
+  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message); }
 }
 
 async function fetchUrl(targetUrl) {
@@ -45,10 +44,7 @@ async function fetchUrl(targetUrl) {
     const opts = {
       hostname: parsed.hostname, port: parsed.port || (parsed.protocol==='https:'?443:80),
       path: parsed.pathname + parsed.search, method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html,application/xhtml+xml',
-        'Accept-Language': 'en-US,en;q=0.5'
-      }, timeout: 30000
+      headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 30000
     };
     const req = mod.request(opts, res => {
       const chunks = [];
@@ -78,7 +74,6 @@ async function loop() {
           const reqFileData = await apiGet(`req_${uuid}.json`);
           const decoded = Buffer.from(reqFileData.content, 'base64').toString('utf-8');
           const reqData = JSON.parse(decoded);
-          console.log(`Processing ${uuid.slice(0,8)}: ${reqData.url}`);
           const response = await fetchUrl(reqData.url);
           const resContent = JSON.stringify({ status:'done', body: response.body, type: response.type, statusCode: response.statusCode, timestamp: Date.now() });
           let resSha = null;
@@ -86,7 +81,7 @@ async function loop() {
           await apiPut(`res_${uuid}.json`, resContent, `Response for ${uuid}`, resSha);
           await apiDelete(`req_${uuid}.json`, reqFileData.sha, `Processed ${uuid}`);
         } catch(e) {
-          console.error(`Error processing ${uuid.slice(0,8)}:`, e.message);
+          console.error('Error:', e.message);
           try {
             const errContent = JSON.stringify({ status:'error', error: e.message, timestamp: Date.now() });
             let resSha = null;
@@ -96,20 +91,8 @@ async function loop() {
           } catch(e2){}
         }
       }
-      const now = Date.now();
-      const resFiles = files.filter(f => f.name.startsWith('res_') && f.name.endsWith('.json'));
-      for (const resFile of resFiles) {
-        try {
-          const resData = await apiGet(resFile.name);
-          const decoded = Buffer.from(resData.content, 'base64').toString('utf-8');
-          const parsed = JSON.parse(decoded);
-          if (parsed.timestamp && (now - parsed.timestamp) > 600000) {
-            await apiDelete(resFile.name, resData.sha, 'Cleanup old response');
-          }
-        } catch(e){}
-      }
+      await sleep(3000);
     } catch(e) { console.error('Loop error:', e.message); }
-    await sleep(3000);
   }
 }
 loop().catch(e => { console.error('Fatal error:', e); process.exit(1); });
