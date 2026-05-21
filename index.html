@@ -36,7 +36,7 @@ pre{white-space:pre-wrap;word-break:break-all;font-size:12px;line-height:1.5}
     console.log(msg);
   }
 
-  logToParent('VPN iframe loaded (UUID version). Token: ' + (TOKEN ? 'yes' : 'no'));
+  logToParent('VPN iframe loaded (raw URL). Token: ' + (TOKEN ? 'yes' : 'no'));
 
   document.getElementById('saveToken').onclick = () => {
     TOKEN = document.getElementById('token').value.trim();

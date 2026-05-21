@@ -96,7 +96,6 @@ async function loop() {
           } catch(e2){}
         }
       }
-      // پاکسازی فایل‌های قدیمی
       const now = Date.now();
       const resFiles = files.filter(f => f.name.startsWith('res_') && f.name.endsWith('.json'));
       for (const resFile of resFiles) {
