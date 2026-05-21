@@ -51,6 +51,7 @@
       document.getElementById('status').innerHTML = 'Sending...';
       document.getElementById('content').innerHTML = '';
       try{
+        // نوشتن درخواست در req.json
         const req = {status:'pending', request:{url:url, method:'GET'}};
         await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`, {
           method:'PUT',
@@ -60,10 +61,20 @@
           },
           body: JSON.stringify({message:'req', content:btoa(JSON.stringify(req))})
         });
+        
+        // انتظار برای پاسخ (خواندن از API به جای Raw URL)
         for(let i=0; i<120; i++){
           await new Promise(r=>setTimeout(r,2000));
-          const res = await fetch(`https://raw.githubusercontent.com/${REPO}/main/res.json?t=${Date.now()}`);
-          const data = await res.json();
+          
+          // دریافت res.json از API گیت‌هاب (با احراز هویت)
+          const apiRes = await fetch(`https://api.github.com/repos/${REPO}/contents/res.json`, {
+            headers: { 'Authorization': `token ${TOKEN}` }
+          });
+          if (!apiRes.ok) continue;
+          
+          const apiData = await apiRes.json();
+          const data = JSON.parse(atob(apiData.content));
+          
           if (data.status === 'done'){
             const bytes = Uint8Array.from(atob(data.body), c=>c.charCodeAt(0));
             const blob = new Blob([bytes], {type: data.type});
