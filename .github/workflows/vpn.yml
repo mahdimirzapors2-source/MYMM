@@ -25,44 +25,86 @@ jobs:
           cat > index.html << 'HTMLEND'
           <!DOCTYPE html>
           <html>
-          <head><meta name="viewport" content="width=device-width,initial-scale=1"><title>VPN</title>
-          <style>body{background:#0d1117;color:#fff;font-family:system-ui;padding:16px}input,button{padding:12px;margin:5px;border-radius:8px}input{flex:1;background:#1f242f;border:1px solid #3d444d;color:#fff}button{background:#238636;border:none;color:#fff;font-weight:bold}.url-bar{display:flex}.content{background:#161b22;border-radius:16px;padding:16px;margin-top:16px;min-height:400px}.status{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(0,0,0,0.8);padding:8px;border-radius:20px;font-size:11px;text-align:center}</style>
+          <head>
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>VPN</title>
+            <style>
+              body{background:#0d1117;color:#fff;font-family:system-ui;padding:16px}
+              input,button{padding:12px;margin:5px;border-radius:8px}
+              input{flex:1;background:#1f242f;border:1px solid #3d444d;color:#fff}
+              button{background:#238636;border:none;color:#fff;font-weight:bold}
+              .url-bar{display:flex;margin-bottom:12px}
+              .token-bar{display:flex;margin-bottom:12px}
+              .content{background:#161b22;border-radius:16px;padding:16px;min-height:400px}
+              .status{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(0,0,0,0.8);padding:8px;border-radius:20px;font-size:11px;text-align:center}
+            </style>
           </head>
           <body>
-          <div class="url-bar"><input id="url" placeholder="https://google.com" value="https://google.com"><button id="go">Go</button></div>
-          <div class="content" id="content"></div>
-          <div class="status" id="status">Ready</div>
-          <script>
-            const REPO = '${{ github.repository }}';
-            const TOKEN = '${{ secrets.GITHUB_TOKEN }}';
-            async function fetchPage(url){
-              document.getElementById('status').innerHTML='Sending...';
-              document.getElementById('content').innerHTML='';
-              try{
-                const req={status:'pending',request:{url:url,method:'GET'}};
-                await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`,{method:'PUT',headers:{'Authorization':`token ${TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({message:'req',content:btoa(JSON.stringify(req))})});
-                for(let i=0;i<60;i++){
-                  const res=await fetch(`https://raw.githubusercontent.com/${REPO}/main/res.json?t=${Date.now()}`);
-                  const data=await res.json();
-                  if(data.status==='done'){
-                    const bytes=Uint8Array.from(atob(data.body),c=>c.charCodeAt(0));
-                    const blob=new Blob([bytes],{type:data.type});
-                    const urlBlob=URL.createObjectURL(blob);
-                    if(data.type.includes('html')) document.getElementById('content').innerHTML='<iframe srcdoc="'+escapeHtml(new TextDecoder().decode(bytes))+'"></iframe>';
-                    else if(data.type.includes('video')) document.getElementById('content').innerHTML='<video controls autoplay src="'+urlBlob+'"></video>';
-                    else document.getElementById('content').innerHTML='<pre>'+escapeHtml(new TextDecoder().decode(bytes))+'</pre>';
-                    document.getElementById('status').innerHTML='Done';
-                    return;
-                  }
-                  await new Promise(r=>setTimeout(r,1000));
+            <div class="token-bar">
+              <input type="password" id="token" placeholder="GitHub token (repo + workflow)">
+              <button id="saveToken">💾 ذخیره</button>
+            </div>
+            <div class="url-bar">
+              <input id="url" placeholder="https://google.com" value="https://google.com">
+              <button id="go">🌐 برو</button>
+            </div>
+            <div class="content" id="content"></div>
+            <div class="status" id="status">Ready</div>
+            <script>
+              const REPO = '${{ github.repository }}';
+              let TOKEN = localStorage.getItem('vpn_token') || '';
+              document.getElementById('token').value = TOKEN;
+              document.getElementById('saveToken').onclick = () => {
+                TOKEN = document.getElementById('token').value.trim();
+                localStorage.setItem('vpn_token', TOKEN);
+                document.getElementById('status').innerHTML = 'Token saved';
+              };
+              async function fetchPage(url){
+                if (!TOKEN) {
+                  document.getElementById('status').innerHTML = '❌ لطفاً ابتدا توکن را وارد کنید';
+                  return;
                 }
-                throw new Error('Timeout');
-              }catch(e){document.getElementById('status').innerHTML='Error: '+e.message;}
-            }
-            function escapeHtml(s){return s.replace(/[&<>]/g,function(m){return m==='&'?'&amp;':m==='<'?'&lt;':m==='>'?'&gt;':m;});}
-            document.getElementById('go').onclick=()=>fetchPage(document.getElementById('url').value);
-            fetchPage('https://google.com');
-          </script>
+                document.getElementById('status').innerHTML = 'Sending...';
+                document.getElementById('content').innerHTML = '';
+                try{
+                  const req = {status:'pending', request:{url:url, method:'GET'}};
+                  await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`, {
+                    method:'PUT',
+                    headers:{
+                      'Authorization': `token ${TOKEN}`,
+                      'Content-Type':'application/json'
+                    },
+                    body: JSON.stringify({message:'req', content:btoa(JSON.stringify(req))})
+                  });
+                  for(let i=0; i<60; i++){
+                    const res = await fetch(`https://raw.githubusercontent.com/${REPO}/main/res.json?t=${Date.now()}`);
+                    const data = await res.json();
+                    if (data.status === 'done'){
+                      const bytes = Uint8Array.from(atob(data.body), c=>c.charCodeAt(0));
+                      const blob = new Blob([bytes], {type: data.type});
+                      const urlBlob = URL.createObjectURL(blob);
+                      if (data.type.includes('html'))
+                        document.getElementById('content').innerHTML = '<iframe srcdoc="'+escapeHtml(new TextDecoder().decode(bytes))+'"></iframe>';
+                      else if (data.type.includes('video'))
+                        document.getElementById('content').innerHTML = '<video controls autoplay src="'+urlBlob+'"></video>';
+                      else
+                        document.getElementById('content').innerHTML = '<pre>'+escapeHtml(new TextDecoder().decode(bytes))+'</pre>';
+                      document.getElementById('status').innerHTML = 'Done';
+                      return;
+                    }
+                    await new Promise(r=>setTimeout(r,1000));
+                  }
+                  throw new Error('Timeout');
+                }catch(e){
+                  document.getElementById('status').innerHTML = 'Error: '+e.message;
+                }
+              }
+              function escapeHtml(s){
+                return s.replace(/[&<>]/g, m => ({'&':'&','<':'<','>':'<'})[m]);
+              }
+              document.getElementById('go').onclick = () => fetchPage(document.getElementById('url').value);
+              fetchPage('https://google.com');
+            </script>
           </body>
           </html>
           HTMLEND
