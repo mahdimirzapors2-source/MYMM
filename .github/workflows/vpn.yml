@@ -1,0 +1,204 @@
+name: "VPN-Puppeteer"
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Puppeteer
+        run: npm install puppeteer
+      - name: Prepare VPN client and server
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          # ایجاد index.html با جایگزینی REPO
+          cat > index.html << 'CLIENTEOF'
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width,initial-scale=1"><title>VPN Browser</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box} body{background:#fff;font-family:system-ui}
+.url-bar{display:flex;padding:8px;background:#0d1117} .url-bar input{flex:1;padding:10px;border:1px solid #30363d;border-radius:8px;background:#1f242f;color:#fff} .url-bar button{padding:10px 20px;margin-left:5px;background:#238636;border:none;color:#fff;border-radius:8px;cursor:pointer}
+.frame{width:100%;height:calc(100vh - 60px);border:none}
+.loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;color:#8b949e}
+</style></head>
+<body>
+<div class="url-bar"><input id="url" placeholder="https://youtube.com" value="https://www.google.com"><button id="go">🌐 برو</button></div>
+<div id="content" class="loading">⏳ صفحه در حال بارگذاری...</div>
+<script>
+const REPO = 'REPO_PLACEHOLDER';
+let TOKEN = localStorage.getItem('vpn_token') || '';
+
+window.addEventListener('message', e => {
+  if (e.data?.type === 'setToken' && e.data?.token) {
+    TOKEN = e.data.token; localStorage.setItem('vpn_token', TOKEN);
+  }
+  if (e.data?.type === 'navigate') {
+    fetchPage(e.data.url);
+  }
+});
+
+async function ghApi(method, path, body) {
+  const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+  const headers = { 'Authorization': `token ${TOKEN}`, 'Accept':'application/vnd.github.v3+json' };
+  const opts = { method, headers };
+  if (body) { headers['Content-Type']='application/json'; opts.body=JSON.stringify(body); }
+  const res = await fetch(url, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'HTTP '+res.status);
+  return data;
+}
+
+function fixUrl(url) {
+  if (!url.startsWith('http')) url = 'https://'+url;
+  return url;
+}
+
+async function fetchPage(rawUrl) {
+  const url = fixUrl(rawUrl);
+  document.getElementById('url').value = url;
+  document.getElementById('content').innerHTML = '<div class="loading">⏳ بارگذاری...</div>';
+
+  const uuid = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36);
+  const reqData = { url, method:'GET', timestamp:Date.now() };
+  await ghApi('PUT', `req_${uuid}.json`, {
+    message: `Request ${uuid}`,
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(reqData)))),
+    branch:'main'
+  });
+
+  let responseData;
+  for(let i=0; i<120; i++) {
+    await new Promise(r=>setTimeout(r,2000));
+    try {
+      const resFile = await ghApi('GET', `res_${uuid}.json`);
+      const decoded = atob(resFile.content);
+      responseData = JSON.parse(decoded);
+      if (responseData.status === 'done' || responseData.status === 'error') break;
+    } catch(e){}
+  }
+  if (!responseData) throw new Error('Timeout');
+  if (responseData.status === 'error') throw new Error(responseData.error);
+
+  const bytes = Uint8Array.from(atob(responseData.body), c=>c.charCodeAt(0));
+  const html = new TextDecoder().decode(bytes);
+  document.getElementById('content').innerHTML = `<iframe class="frame" srcdoc="${html.replace(/"/g,'&quot;')}"></iframe>`;
+}
+
+document.getElementById('go').onclick = ()=> fetchPage(document.getElementById('url').value);
+document.getElementById('url').addEventListener('keydown', e => { if (e.key==='Enter') fetchPage(document.getElementById('url').value); });
+window.parent.postMessage({type:'vpn-ready'}, '*');
+if (TOKEN) fetchPage('https://www.google.com');
+else setTimeout(() => fetchPage('https://www.google.com'), 2000);
+</script>
+</body></html>
+CLIENTEOF
+          sed -i "s/REPO_PLACEHOLDER/$REPO/g" index.html
+
+          # ایجاد server.js
+          cat > server.js << 'SERVEREOF'
+          const fs = require('fs');
+          const puppeteer = require('puppeteer');
+          const TOKEN = process.env.GITHUB_TOKEN;
+          const REPO = process.env.GITHUB_REPOSITORY;
+          const BASE = `https://api.github.com/repos/${REPO}/contents`;
+          const HEADERS = {
+            'Authorization': `token ${TOKEN}`,
+            'Accept':'application/vnd.github.v3+json',
+            'User-Agent':'VPN-Puppeteer/1.0'
+          };
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const api = {
+            get: async (path) => {
+              const r = await fetch(`${BASE}/${path}`, { headers: HEADERS });
+              if (!r.ok) throw new Error((await r.json().catch(()=>({}))).message);
+              return r.json();
+            },
+            put: async (path, content, msg, sha) => {
+              const body = { message: msg, content: Buffer.from(content).toString('base64'), branch:'main' };
+              if (sha) body.sha = sha;
+              const r = await fetch(`${BASE}/${path}`, { method:'PUT', headers:{...HEADERS,'Content-Type':'application/json'}, body: JSON.stringify(body) });
+              if (!r.ok) throw new Error((await r.json().catch(()=>({}))).message);
+              return r.json();
+            },
+            delete: async (path, sha, msg) => {
+              const r = await fetch(`${BASE}/${path}`, { method:'DELETE', headers:{...HEADERS,'Content-Type':'application/json'}, body: JSON.stringify({message:msg, sha, branch:'main'}) });
+              if (!r.ok) throw new Error((await r.json().catch(()=>({}))).message);
+            }
+          };
+
+          (async () => {
+            console.log('Puppeteer VPN server started');
+            const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox','--disable-setuid-sandbox'] });
+            while (true) {
+              try {
+                const files = await api.get('');
+                const reqs = files.filter(f => f.name.startsWith('req_') && f.name.endsWith('.json'));
+                for (const reqFile of reqs) {
+                  const uuid = reqFile.name.replace('req_','').replace('.json','');
+                  try {
+                    const reqContent = await api.get(`req_${uuid}.json`);
+                    const reqData = JSON.parse(Buffer.from(reqContent.content, 'base64').toString());
+                    console.log(`Processing ${uuid}: ${reqData.url}`);
+                    const page = await browser.newPage();
+                    await page.setViewport({ width: 1280, height: 720 });
+                    await page.goto(reqData.url, { waitUntil: 'networkidle2', timeout: 60000 });
+                    const finalHtml = await page.evaluate(() => {
+                      document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+                        try {
+                          const style = document.createElement('style');
+                          style.textContent = Array.from(link.sheet.cssRules).map(r => r.cssText).join('\n');
+                          link.replaceWith(style);
+                        } catch(e) {}
+                      });
+                      return '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+                    });
+                    await page.close();
+                    const resContent = JSON.stringify({ status:'done', body: Buffer.from(finalHtml).toString('base64'), type:'text/html', statusCode:200 });
+                    await api.put(`res_${uuid}.json`, resContent, `Response ${uuid}`);
+                    await api.delete(`req_${uuid}.json`, reqFile.sha, 'Processed');
+                  } catch (e) {
+                    try {
+                      const errContent = JSON.stringify({ status:'error', error: e.message });
+                      await api.put(`res_${uuid}.json`, errContent, `Error ${uuid}`);
+                      await api.delete(`req_${uuid}.json`, reqFile.sha, 'Error');
+                    } catch(_){}
+                  }
+                }
+                const now = Date.now();
+                const resFiles = files.filter(f => f.name.startsWith('res_') && f.name.endsWith('.json'));
+                for (const rf of resFiles) {
+                  try {
+                    const data = await api.get(rf.name);
+                    const parsed = JSON.parse(Buffer.from(data.content, 'base64').toString());
+                    if (parsed.timestamp && now - parsed.timestamp > 300000) {
+                      await api.delete(rf.name, data.sha, 'Cleanup');
+                    }
+                  } catch(e) {}
+                }
+              } catch(e) {}
+              await sleep(3000);
+            }
+          })();
+          SERVEREOF
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html server.js
+          git commit -m "Deploy VPN" || true
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name || 'main' }} --force
+      - name: Run VPN server
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node server.js
