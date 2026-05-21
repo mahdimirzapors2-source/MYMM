@@ -14,118 +14,100 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
       - name: Build VPN and Start Server
         run: |
           cat > index.html << 'HTMLEND'
           <!DOCTYPE html>
           <html>
-          <head>
-            <meta name="viewport" content="width=device-width,initial-scale=1">
-            <title>VPN</title>
-            <style>
-              body{background:#0d1117;color:#fff;font-family:system-ui;padding:16px}
-              input,button{padding:12px;margin:5px;border-radius:8px}
-              input{flex:1;background:#1f242f;border:1px solid #3d444d;color:#fff}
-              button{background:#238636;border:none;color:#fff;font-weight:bold}
-              .url-bar{display:flex;margin-bottom:12px}
-              .token-bar{display:flex;margin-bottom:12px}
-              .content{background:#161b22;border-radius:16px;padding:16px;min-height:400px}
-              .status{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(0,0,0,0.8);padding:8px;border-radius:20px;font-size:11px;text-align:center}
-            </style>
+          <head><meta name="viewport" content="width=device-width,initial-scale=1"><title>VPN</title>
+          <style>body{background:#0d1117;color:#fff;font-family:system-ui;padding:16px}input,button{padding:12px;margin:5px;border-radius:8px}input{flex:1;background:#1f242f;border:1px solid #3d444d;color:#fff}button{background:#238636;border:none;color:#fff;font-weight:bold}.url-bar{display:flex;margin-bottom:12px}.token-bar{display:flex;margin-bottom:12px}.content{background:#161b22;border-radius:16px;padding:16px;min-height:400px}.status{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(0,0,0,0.8);padding:8px;border-radius:20px;font-size:11px;text-align:center}</style>
           </head>
           <body>
-            <div class="token-bar">
-              <input type="password" id="token" placeholder="GitHub token (repo + workflow)">
-              <button id="saveToken">💾 ذخیره</button>
-            </div>
-            <div class="url-bar">
-              <input id="url" placeholder="https://google.com" value="https://google.com">
-              <button id="go">🌐 برو</button>
-            </div>
-            <div class="content" id="content"></div>
-            <div class="status" id="status">Ready</div>
-            <script>
-              const REPO = '${{ github.repository }}';
-              let TOKEN = localStorage.getItem('vpn_token') || '';
-              document.getElementById('token').value = TOKEN;
-              document.getElementById('saveToken').onclick = () => {
-                TOKEN = document.getElementById('token').value.trim();
-                localStorage.setItem('vpn_token', TOKEN);
-                document.getElementById('status').innerHTML = 'Token saved';
-              };
-              
-              // گوش دادن به پیام‌های ارسالی از صفحهٔ Builder
-              window.addEventListener('message', function(e) {
-                if (e.data && e.data.type === 'navigate') {
-                  document.getElementById('url').value = e.data.url;
-                  fetchPage(e.data.url);
-                }
-              });
-              
-              async function fetchPage(url){
-                if (!TOKEN) {
-                  document.getElementById('status').innerHTML = '❌ لطفاً ابتدا توکن را وارد کنید';
-                  return;
-                }
-                document.getElementById('status').innerHTML = 'Sending...';
-                document.getElementById('content').innerHTML = '';
-                try{
-                  // نوشتن درخواست در req.json
-                  const req = {status:'pending', request:{url:url, method:'GET'}};
-                  await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`, {
-                    method:'PUT',
-                    headers:{
-                      'Authorization': `token ${TOKEN}`,
-                      'Content-Type':'application/json'
-                    },
-                    body: JSON.stringify({message:'req', content:btoa(JSON.stringify(req))})
+          <div class="token-bar"><input type="password" id="token" placeholder="GitHub token"><button id="saveToken">💾 ذخیره</button></div>
+          <div class="url-bar"><input id="url" placeholder="https://google.com" value="https://google.com"><button id="go">🌐 برو</button></div>
+          <div class="content" id="content"></div>
+          <div class="status" id="status">Ready</div>
+          <script>
+            const REPO = '${{ github.repository }}';
+            let TOKEN = localStorage.getItem('vpn_token') || '';
+            document.getElementById('token').value = TOKEN;
+            document.getElementById('saveToken').onclick = () => {
+              TOKEN = document.getElementById('token').value.trim();
+              localStorage.setItem('vpn_token', TOKEN);
+              document.getElementById('status').innerHTML = 'Token saved';
+            };
+            window.addEventListener('message', e => {
+              if (e.data?.type === 'navigate') {
+                document.getElementById('url').value = e.data.url;
+                fetchPage(e.data.url);
+              }
+            });
+            async function fetchPage(url){
+              if (!TOKEN) return document.getElementById('status').innerHTML = '❌ توکن را وارد کنید';
+              document.getElementById('status').innerHTML = 'Sending...';
+              document.getElementById('content').innerHTML = '';
+              try{
+                // دریافت SHA فعلی req.json
+                let sha = null;
+                const getReq = await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`, {
+                  headers: { 'Authorization': `token ${TOKEN}` }
+                });
+                if (getReq.ok) sha = (await getReq.json()).sha;
+                
+                // ایجاد درخواست جدید
+                const reqData = {status:'pending', request:{url:url, method:'GET'}};
+                const putBody = {
+                  message: 'req',
+                  content: btoa(unescape(encodeURIComponent(JSON.stringify(reqData)))),
+                  branch: 'main'
+                };
+                if (sha) putBody.sha = sha;
+                
+                const putRes = await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`, {
+                  method: 'PUT',
+                  headers: {
+                    'Authorization': `token ${TOKEN}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(putBody)
+                });
+                if (!putRes.ok) throw new Error('Write error: ' + (await putRes.json()).message);
+                
+                // انتظار برای پاسخ
+                for(let i=0; i<120; i++){
+                  await new Promise(r=>setTimeout(r,2000));
+                  const apiRes = await fetch(`https://api.github.com/repos/${REPO}/contents/res.json`, {
+                    headers: { 'Authorization': `token ${TOKEN}` }
                   });
-                  
-                  // انتظار برای پاسخ (خواندن از API به جای Raw URL)
-                  for(let i=0; i<120; i++){
-                    await new Promise(r=>setTimeout(r,2000));
-                    
-                    // دریافت res.json از API گیت‌هاب (با احراز هویت)
-                    const apiRes = await fetch(`https://api.github.com/repos/${REPO}/contents/res.json`, {
-                      headers: { 'Authorization': `token ${TOKEN}` }
-                    });
-                    if (!apiRes.ok) continue;
-                    
-                    const apiData = await apiRes.json();
-                    const data = JSON.parse(atob(apiData.content));
-                    
-                    if (data.status === 'done'){
-                      const bytes = Uint8Array.from(atob(data.body), c=>c.charCodeAt(0));
-                      const blob = new Blob([bytes], {type: data.type});
-                      const urlBlob = URL.createObjectURL(blob);
-                      if (data.type.includes('html'))
-                        document.getElementById('content').innerHTML = '<iframe style="width:100%;height:500px;border:none" srcdoc="'+escapeHtml(new TextDecoder().decode(bytes))+'"></iframe>';
-                      else if (data.type.includes('video'))
-                        document.getElementById('content').innerHTML = '<video controls autoplay src="'+urlBlob+'"></video>';
-                      else
-                        document.getElementById('content').innerHTML = '<pre>'+escapeHtml(new TextDecoder().decode(bytes))+'</pre>';
-                      document.getElementById('status').innerHTML = 'Done';
-                      return;
-                    }
+                  if (!apiRes.ok) continue;
+                  const apiData = await apiRes.json();
+                  const data = JSON.parse(atob(apiData.content));
+                  if (data.status === 'done'){
+                    const bytes = Uint8Array.from(atob(data.body), c=>c.charCodeAt(0));
+                    const blob = new Blob([bytes], {type: data.type});
+                    const urlBlob = URL.createObjectURL(blob);
+                    if (data.type.includes('html'))
+                      document.getElementById('content').innerHTML = '<iframe style="width:100%;height:500px;border:none" srcdoc="'+escapeHtml(new TextDecoder().decode(bytes))+'"></iframe>';
+                    else if (data.type.includes('video'))
+                      document.getElementById('content').innerHTML = '<video controls autoplay src="'+urlBlob+'"></video>';
+                    else
+                      document.getElementById('content').innerHTML = '<pre>'+escapeHtml(new TextDecoder().decode(bytes))+'</pre>';
+                    document.getElementById('status').innerHTML = 'Done';
+                    return;
                   }
-                  throw new Error('Timeout');
-                }catch(e){
-                  document.getElementById('status').innerHTML = 'Error: '+e.message;
                 }
+                throw new Error('Timeout');
+              }catch(e){
+                document.getElementById('status').innerHTML = 'Error: '+e.message;
               }
-              function escapeHtml(s){
-                return s.replace(/[&<>]/g, m => ({'&':'&','<':'<','>':'>'})[m]);
-              }
-              document.getElementById('go').onclick = () => fetchPage(document.getElementById('url').value);
-              // بارگذاری اولیه فقط در صورت وجود توکن
-              if (TOKEN) fetchPage('https://google.com');
-            </script>
+            }
+            function escapeHtml(s){ return s.replace(/[&<>]/g, m => ({'&':'&','<':'<','>':'>'})[m]); }
+            document.getElementById('go').onclick = () => fetchPage(document.getElementById('url').value);
+            if (TOKEN) fetchPage('https://google.com');
+          </script>
           </body>
           </html>
           HTMLEND
@@ -137,83 +119,43 @@ jobs:
           const REPO=process.env.GITHUB_REPOSITORY;
           const BRANCH=process.env.GITHUB_REF_NAME||'main';
           const REMOTE=`https://x-access-token:${TOKEN}@github.com/${REPO}.git`;
-          
           function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
           function git(cmd){execSync(`git ${cmd}`,{stdio:'pipe',env:{...process.env,GIT_ASKPASS:'echo'}});}
-          
           async function loop(){
             while(true){
               try{
-                // دریافت آخرین تغییرات
                 execSync('git pull ' + REMOTE + ' ' + BRANCH, {stdio:'pipe',env:{...process.env,GIT_ASKPASS:'echo'}});
-                
                 let req=null;
                 try{req=JSON.parse(fs.readFileSync(reqFile));}catch(e){}
-                
                 if(req && req.status==='pending'){
                   console.log('Forwarding:', req.request.url);
                   const parsed = url.parse(req.request.url);
                   const p = parsed.protocol === 'https:' ? https : http;
-                  
                   const response = await new Promise((resolve, reject) => {
-                    const options = {
-                      hostname: parsed.hostname,
-                      port: parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
-                      path: parsed.path,
-                      method: req.request.method || 'GET',
-                      headers: {
-                        'User-Agent': 'Mozilla/5.0'
-                      }
-                    };
-                    
-                    const proxyReq = p.request(options, (proxyRes) => {
-                      const chunks = [];
-                      proxyRes.on('data', c => chunks.push(c));
-                      proxyRes.on('end', () => {
-                        resolve({
-                          body: Buffer.concat(chunks).toString('base64'),
-                          type: proxyRes.headers['content-type'] || 'text/plain'
-                        });
-                      });
-                    });
-                    
-                    proxyReq.on('error', reject);
-                    proxyReq.end();
+                    const opts = {hostname:parsed.hostname,port:parsed.port||(parsed.protocol==='https:'?443:80),path:parsed.path,method:'GET',headers:{'User-Agent':'Mozilla/5.0'}};
+                    p.request(opts, res => {
+                      const chunks=[];
+                      res.on('data',c=>chunks.push(c));
+                      res.on('end',()=>resolve({body:Buffer.concat(chunks).toString('base64'),type:res.headers['content-type']||'text/plain'}));
+                    }).on('error',reject).end();
                   });
-                  
-                  fs.writeFileSync(resFile, JSON.stringify({
-                    status: 'done',
-                    body: response.body,
-                    type: response.type
-                  }));
-                  
-                  execSync('git add ' + resFile, {stdio:'pipe',env:{...process.env,GIT_ASKPASS:'echo'}});
-                  execSync('git commit -m "response" --allow-empty', {stdio:'pipe',env:{...process.env,GIT_ASKPASS:'echo'}});
-                  execSync('git push ' + REMOTE + ' HEAD:' + BRANCH, {stdio:'pipe',env:{...process.env,GIT_ASKPASS:'echo'}});
-                  
-                  fs.writeFileSync(reqFile, JSON.stringify({status: 'waiting'}));
-                  execSync('git add ' + reqFile, {stdio:'pipe',env:{...process.env,GIT_ASKPASS:'echo'}});
-                  execSync('git commit -m "reset request" --allow-empty', {stdio:'pipe',env:{...process.env,GIT_ASKPASS:'echo'}});
-                  execSync('git push ' + REMOTE + ' HEAD:' + BRANCH, {stdio:'pipe',env:{...process.env,GIT_ASKPASS:'echo'}});
+                  fs.writeFileSync(resFile, JSON.stringify({status:'done',body:response.body,type:response.type}));
+                  git('add '+resFile); git('commit -m "resp" --allow-empty'); git('push '+REMOTE+' HEAD:'+BRANCH);
+                  fs.writeFileSync(reqFile, JSON.stringify({status:'waiting'}));
+                  git('add '+reqFile); git('commit -m "reset" --allow-empty'); git('push '+REMOTE+' HEAD:'+BRANCH);
                 }
-              } catch(e) {
-                console.log('Error in loop:', e.message);
-              }
+              }catch(e){}
               await sleep(3000);
             }
           }
-          
-          loop().catch(e => console.log('Fatal error:', e));
-          console.log('VPN Server is running...');
+          loop();
+          console.log('VPN Server running...');
           SERVEREND
           
-          # ارسال اولیهٔ فایل‌ها
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           echo '{"status":"waiting"}' > req.json
           echo '{"status":"waiting"}' > res.json
           git add . && git commit -m "VPN setup" || true
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name || 'main' }} || true
-          
-          # اجرای سرور
           node server.js
