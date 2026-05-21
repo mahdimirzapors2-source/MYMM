@@ -1,105 +1,90 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>VPN</title>
-  <style>
-    body{background:#0d1117;color:#fff;font-family:system-ui;padding:16px}
-    input,button{padding:12px;margin:5px;border-radius:8px}
-    input{flex:1;background:#1f242f;border:1px solid #3d444d;color:#fff}
-    button{background:#238636;border:none;color:#fff;font-weight:bold}
-    .url-bar{display:flex;margin-bottom:12px}
-    .token-bar{display:flex;margin-bottom:12px}
-    .content{background:#161b22;border-radius:16px;padding:16px;min-height:400px}
-    .status{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(0,0,0,0.8);padding:8px;border-radius:20px;font-size:11px;text-align:center}
-  </style>
+<head><meta name="viewport" content="width=device-width,initial-scale=1"><title>VPN</title>
+<style>body{background:#0d1117;color:#fff;font-family:system-ui;padding:16px}input,button{padding:12px;margin:5px;border-radius:8px}input{flex:1;background:#1f242f;border:1px solid #3d444d;color:#fff}button{background:#238636;border:none;color:#fff;font-weight:bold}.url-bar{display:flex;margin-bottom:12px}.token-bar{display:flex;margin-bottom:12px}.content{background:#161b22;border-radius:16px;padding:16px;min-height:400px}.status{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(0,0,0,0.8);padding:8px;border-radius:20px;font-size:11px;text-align:center}</style>
 </head>
 <body>
-  <div class="token-bar">
-    <input type="password" id="token" placeholder="GitHub token (repo + workflow)">
-    <button id="saveToken">💾 ذخیره</button>
-  </div>
-  <div class="url-bar">
-    <input id="url" placeholder="https://google.com" value="https://google.com">
-    <button id="go">🌐 برو</button>
-  </div>
-  <div class="content" id="content"></div>
-  <div class="status" id="status">Ready</div>
-  <script>
-    const REPO = 'mahdimirzapors2-source/MYMM';
-    let TOKEN = localStorage.getItem('vpn_token') || '';
-    document.getElementById('token').value = TOKEN;
-    document.getElementById('saveToken').onclick = () => {
-      TOKEN = document.getElementById('token').value.trim();
-      localStorage.setItem('vpn_token', TOKEN);
-      document.getElementById('status').innerHTML = 'Token saved';
-    };
-    
-    // گوش دادن به پیام‌های ارسالی از صفحهٔ Builder
-    window.addEventListener('message', function(e) {
-      if (e.data && e.data.type === 'navigate') {
-        document.getElementById('url').value = e.data.url;
-        fetchPage(e.data.url);
-      }
-    });
-    
-    async function fetchPage(url){
-      if (!TOKEN) {
-        document.getElementById('status').innerHTML = '❌ لطفاً ابتدا توکن را وارد کنید';
-        return;
-      }
-      document.getElementById('status').innerHTML = 'Sending...';
-      document.getElementById('content').innerHTML = '';
-      try{
-        // نوشتن درخواست در req.json
-        const req = {status:'pending', request:{url:url, method:'GET'}};
-        await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`, {
-          method:'PUT',
-          headers:{
-            'Authorization': `token ${TOKEN}`,
-            'Content-Type':'application/json'
-          },
-          body: JSON.stringify({message:'req', content:btoa(JSON.stringify(req))})
+<div class="token-bar"><input type="password" id="token" placeholder="GitHub token"><button id="saveToken">💾 ذخیره</button></div>
+<div class="url-bar"><input id="url" placeholder="https://google.com" value="https://google.com"><button id="go">🌐 برو</button></div>
+<div class="content" id="content"></div>
+<div class="status" id="status">Ready</div>
+<script>
+  const REPO = 'mahdimirzapors2-source/MYMM';
+  let TOKEN = localStorage.getItem('vpn_token') || '';
+  document.getElementById('token').value = TOKEN;
+  document.getElementById('saveToken').onclick = () => {
+    TOKEN = document.getElementById('token').value.trim();
+    localStorage.setItem('vpn_token', TOKEN);
+    document.getElementById('status').innerHTML = 'Token saved';
+  };
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'navigate') {
+      document.getElementById('url').value = e.data.url;
+      fetchPage(e.data.url);
+    }
+  });
+  async function fetchPage(url){
+    if (!TOKEN) return document.getElementById('status').innerHTML = '❌ توکن را وارد کنید';
+    document.getElementById('status').innerHTML = 'Sending...';
+    document.getElementById('content').innerHTML = '';
+    try{
+      // دریافت SHA فعلی req.json
+      let sha = null;
+      const getReq = await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`, {
+        headers: { 'Authorization': `token ${TOKEN}` }
+      });
+      if (getReq.ok) sha = (await getReq.json()).sha;
+      
+      // ایجاد درخواست جدید
+      const reqData = {status:'pending', request:{url:url, method:'GET'}};
+      const putBody = {
+        message: 'req',
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(reqData)))),
+        branch: 'main'
+      };
+      if (sha) putBody.sha = sha;
+      
+      const putRes = await fetch(`https://api.github.com/repos/${REPO}/contents/req.json`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(putBody)
+      });
+      if (!putRes.ok) throw new Error('Write error: ' + (await putRes.json()).message);
+      
+      // انتظار برای پاسخ
+      for(let i=0; i<120; i++){
+        await new Promise(r=>setTimeout(r,2000));
+        const apiRes = await fetch(`https://api.github.com/repos/${REPO}/contents/res.json`, {
+          headers: { 'Authorization': `token ${TOKEN}` }
         });
-        
-        // انتظار برای پاسخ (خواندن از API به جای Raw URL)
-        for(let i=0; i<120; i++){
-          await new Promise(r=>setTimeout(r,2000));
-          
-          // دریافت res.json از API گیت‌هاب (با احراز هویت)
-          const apiRes = await fetch(`https://api.github.com/repos/${REPO}/contents/res.json`, {
-            headers: { 'Authorization': `token ${TOKEN}` }
-          });
-          if (!apiRes.ok) continue;
-          
-          const apiData = await apiRes.json();
-          const data = JSON.parse(atob(apiData.content));
-          
-          if (data.status === 'done'){
-            const bytes = Uint8Array.from(atob(data.body), c=>c.charCodeAt(0));
-            const blob = new Blob([bytes], {type: data.type});
-            const urlBlob = URL.createObjectURL(blob);
-            if (data.type.includes('html'))
-              document.getElementById('content').innerHTML = '<iframe style="width:100%;height:500px;border:none" srcdoc="'+escapeHtml(new TextDecoder().decode(bytes))+'"></iframe>';
-            else if (data.type.includes('video'))
-              document.getElementById('content').innerHTML = '<video controls autoplay src="'+urlBlob+'"></video>';
-            else
-              document.getElementById('content').innerHTML = '<pre>'+escapeHtml(new TextDecoder().decode(bytes))+'</pre>';
-            document.getElementById('status').innerHTML = 'Done';
-            return;
-          }
+        if (!apiRes.ok) continue;
+        const apiData = await apiRes.json();
+        const data = JSON.parse(atob(apiData.content));
+        if (data.status === 'done'){
+          const bytes = Uint8Array.from(atob(data.body), c=>c.charCodeAt(0));
+          const blob = new Blob([bytes], {type: data.type});
+          const urlBlob = URL.createObjectURL(blob);
+          if (data.type.includes('html'))
+            document.getElementById('content').innerHTML = '<iframe style="width:100%;height:500px;border:none" srcdoc="'+escapeHtml(new TextDecoder().decode(bytes))+'"></iframe>';
+          else if (data.type.includes('video'))
+            document.getElementById('content').innerHTML = '<video controls autoplay src="'+urlBlob+'"></video>';
+          else
+            document.getElementById('content').innerHTML = '<pre>'+escapeHtml(new TextDecoder().decode(bytes))+'</pre>';
+          document.getElementById('status').innerHTML = 'Done';
+          return;
         }
-        throw new Error('Timeout');
-      }catch(e){
-        document.getElementById('status').innerHTML = 'Error: '+e.message;
       }
+      throw new Error('Timeout');
+    }catch(e){
+      document.getElementById('status').innerHTML = 'Error: '+e.message;
     }
-    function escapeHtml(s){
-      return s.replace(/[&<>]/g, m => ({'&':'&','<':'<','>':'>'})[m]);
-    }
-    document.getElementById('go').onclick = () => fetchPage(document.getElementById('url').value);
-    // بارگذاری اولیه فقط در صورت وجود توکن
-    if (TOKEN) fetchPage('https://google.com');
-  </script>
+  }
+  function escapeHtml(s){ return s.replace(/[&<>]/g, m => ({'&':'&','<':'<','>':'>'})[m]); }
+  document.getElementById('go').onclick = () => fetchPage(document.getElementById('url').value);
+  if (TOKEN) fetchPage('https://google.com');
+</script>
 </body>
 </html>
