@@ -1,0 +1,29 @@
+name: website-capture
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install playwright node-fetch@2
+      - run: npx playwright install --with-deps chromium
+
+      - name: Run capture server
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+        run: node .github/script/server.js
