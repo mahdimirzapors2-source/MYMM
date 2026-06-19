@@ -1,1 +1,1129 @@
-{"status":"done","body":"LyoKICogU2VlOiBodHRwczovL2ZvbnRzLmdvb2dsZS5jb20vbGljZW5zZS9nb29nbGVyZXN0cmljdGVkCiAqLwpAZm9udC1mYWNlIHsKICBmb250LWZhbWlseTogJ1JvYm90byc7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiAzMDA7CiAgZm9udC1zdHJldGNoOiBub3JtYWw7CiAgZm9udC1kaXNwbGF5OiBzd2FwOwogIHNyYzogdXJsKGh0dHBzOi8vZm9udHMuZ3N0YXRpYy5jb20vcy9yb2JvdG8vdjUxL0tGT01DbnFFdTkyRnIxTUU3a1NuNjZhR0xkVHlsVUFNUVhDODlZbUMyRFBOV3VhYWJXbVQudHRmKSBmb3JtYXQoJ3RydWV0eXBlJyk7Cn0KQGZvbnQtZmFjZSB7CiAgZm9udC1mYW1pbHk6ICdSb2JvdG8nOwogIGZvbnQtc3R5bGU6IG5vcm1hbDsKICBmb250LXdlaWdodDogNDAwOwogIGZvbnQtc3RyZXRjaDogbm9ybWFsOwogIGZvbnQtZGlzcGxheTogc3dhcDsKICBzcmM6IHVybChodHRwczovL2ZvbnRzLmdzdGF0aWMuY29tL3Mvcm9ib3RvL3Y1MS9LRk9NQ25xRXU5MkZyMU1FN2tTbjY2YUdMZFR5bFVBTVFYQzg5WW1DMkRQTld1YkViV21ULnR0ZikgZm9ybWF0KCd0cnVldHlwZScpOwp9CkBmb250LWZhY2UgewogIGZvbnQtZmFtaWx5OiAnUm9ib3RvJzsKICBmb250LXN0eWxlOiBub3JtYWw7CiAgZm9udC13ZWlnaHQ6IDUwMDsKICBmb250LXN0cmV0Y2g6IG5vcm1hbDsKICBmb250LWRpc3BsYXk6IHN3YXA7CiAgc3JjOiB1cmwoaHR0cHM6Ly9mb250cy5nc3RhdGljLmNvbS9zL3JvYm90by92NTEvS0ZPTUNucUV1OTJGcjFNRTdrU242NmFHTGRUeWxVQU1RWEM4OVltQzJEUE5XdWIyYldtVC50dGYpIGZvcm1hdCgndHJ1ZXR5cGUnKTsKfQpAZm9udC1mYWNlIHsKICBmb250LWZhbWlseTogJ1JvYm90byc7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA3MDA7CiAgZm9udC1zdHJldGNoOiBub3JtYWw7CiAgZm9udC1kaXNwbGF5OiBzd2FwOwogIHNyYzogdXJsKGh0dHBzOi8vZm9udHMuZ3N0YXRpYy5jb20vcy9yb2JvdG8vdjUxL0tGT01DbnFFdTkyRnIxTUU3a1NuNjZhR0xkVHlsVUFNUVhDODlZbUMyRFBOV3VZamFtbVQudHRmKSBmb3JtYXQoJ3RydWV0eXBlJyk7Cn0KQGZvbnQtZmFjZSB7CiAgZm9udC1mYW1pbHk6ICdZb3VUdWJlIFNhbnMnOwogIGZvbnQtc3R5bGU6IG5vcm1hbDsKICBmb250LXdlaWdodDogMzAwOwogIGZvbnQtZGlzcGxheTogc3dhcDsKICBzcmM6IHVybChodHRwczovL2ZvbnRzLmdzdGF0aWMuY29tL3MveW91dHViZXNhbnMvdjMyL1F3M2haUU5HRURqYU8ybTZ0cUlxWDVFLUFWUzVfclNlam80Nl9QQ1RSc3BKME9vc29sckJFSkwzSE1YZnhRQVNsdUwybV9kQVdWYUFBUS50dGYpIGZvcm1hdCgndHJ1ZXR5cGUnKTsKfQpAZm9udC1mYWNlIHsKICBmb250LWZhbWlseTogJ1lvdVR1YmUgU2Fucyc7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA0MDA7CiAgZm9udC1kaXNwbGF5OiBzd2FwOwogIHNyYzogdXJsKGh0dHBzOi8vZm9udHMuZ3N0YXRpYy5jb20vcy95b3V0dWJlc2Fucy92MzIvUXczaFpRTkdFRGphTzJtNnRxSXFYNUUtQVZTNV9yU2VqbzQ2X1BDVFJzcEowT29zb2xyQkVKTDNITVhmeFFBU2x1TDJtX2RBQjFhQUFRLnR0ZikgZm9ybWF0KCd0cnVldHlwZScpOwp9CkBmb250LWZhY2UgewogIGZvbnQtZmFtaWx5OiAnWW91VHViZSBTYW5zJzsKICBmb250LXN0eWxlOiBub3JtYWw7CiAgZm9udC13ZWlnaHQ6IDUwMDsKICBmb250LWRpc3BsYXk6IHN3YXA7CiAgc3JjOiB1cmwoaHR0cHM6Ly9mb250cy5nc3RhdGljLmNvbS9zL3lvdXR1YmVzYW5zL3YzMi9RdzNoWlFOR0VEamFPMm02dHFJcVg1RS1BVlM1X3JTZWpvNDZfUENUUnNwSjBPb3NvbHJCRUpMM0hNWGZ4UUFTbHVMMm1fZEFOVmFBQVEudHRmKSBmb3JtYXQoJ3RydWV0eXBlJyk7Cn0KQGZvbnQtZmFjZSB7CiAgZm9udC1mYW1pbHk6ICdZb3VUdWJlIFNhbnMnOwogIGZvbnQtc3R5bGU6IG5vcm1hbDsKICBmb250LXdlaWdodDogNjAwOwogIGZvbnQtZGlzcGxheTogc3dhcDsKICBzcmM6IHVybChodHRwczovL2ZvbnRzLmdzdGF0aWMuY29tL3MveW91dHViZXNhbnMvdjMyL1F3M2haUU5HRURqYU8ybTZ0cUlxWDVFLUFWUzVfclNlam80Nl9QQ1RSc3BKME9vc29sckJFSkwzSE1YZnhRQVNsdUwybV9kQTJWR0FBUS50dGYpIGZvcm1hdCgndHJ1ZXR5cGUnKTsKfQpAZm9udC1mYWNlIHsKICBmb250LWZhbWlseTogJ1lvdVR1YmUgU2Fucyc7CiAgZm9udC1zdHlsZTogbm9ybWFsOwogIGZvbnQtd2VpZ2h0OiA3MDA7CiAgZm9udC1kaXNwbGF5OiBzd2FwOwogIHNyYzogdXJsKGh0dHBzOi8vZm9udHMuZ3N0YXRpYy5jb20vcy95b3V0dWJlc2Fucy92MzIvUXczaFpRTkdFRGphTzJtNnRxSXFYNUUtQVZTNV9yU2VqbzQ2X1BDVFJzcEowT29zb2xyQkVKTDNITVhmeFFBU2x1TDJtX2RBNEZHQUFRLnR0ZikgZm9ybWF0KCd0cnVldHlwZScpOwp9CkBmb250LWZhY2UgewogIGZvbnQtZmFtaWx5OiAnWW91VHViZSBTYW5zJzsKICBmb250LXN0eWxlOiBub3JtYWw7CiAgZm9udC13ZWlnaHQ6IDgwMDsKICBmb250LWRpc3BsYXk6IHN3YXA7CiAgc3JjOiB1cmwoaHR0cHM6Ly9mb250cy5nc3RhdGljLmNvbS9zL3lvdXR1YmVzYW5zL3YzMi9RdzNoWlFOR0VEamFPMm02dHFJcVg1RS1BVlM1X3JTZWpvNDZfUENUUnNwSjBPb3NvbHJCRUpMM0hNWGZ4UUFTbHVMMm1fZEFoMUdBQVEudHRmKSBmb3JtYXQoJ3RydWV0eXBlJyk7Cn0KQGZvbnQtZmFjZSB7CiAgZm9udC1mYW1pbHk6ICdZb3VUdWJlIFNhbnMnOwogIGZvbnQtc3R5bGU6IG5vcm1hbDsKICBmb250LXdlaWdodDogOTAwOwogIGZvbnQtZGlzcGxheTogc3dhcDsKICBzcmM6IHVybChodHRwczovL2ZvbnRzLmdzdGF0aWMuY29tL3MveW91dHViZXNhbnMvdjMyL1F3M2haUU5HRURqYU8ybTZ0cUlxWDVFLUFWUzVfclNlam80Nl9QQ1RSc3BKME9vc29sckJFSkwzSE1YZnhRQVNsdUwybV9kQXJsR0FBUS50dGYpIGZvcm1hdCgndHJ1ZXR5cGUnKTsKfQo=","type":"text/css; charset=utf-8","statusCode":200,"timestamp":1779380520686}
+gg.require('8.0')
+gg.setVisible(false)
+
+-- =========================
+-- متغیرهای سراسری
+-- =========================
+local myCharAddr = nil
+local enemyAddrs = {}       -- {addr, type, name, enabled, boneMode}
+local yawAddr = nil
+local pitchAddr = nil
+
+-- متغیرهای دکمه شلیک
+local fireButtonAddr = nil   -- آدرس دکمه شلیک (بایت 432)
+local fireToggleActive = true -- فعال بودن حالت دکمه‌ای
+local lastFireState = 0      -- وضعیت قبلی دکمه شلیک
+
+-- متغیرهای جدید برای سیستم Frame-Aligned Prediction
+local currentTarget = nil     -- {index, addr, type, name, posHistory}
+local targetPosHistory = {}   -- تاریخچه موقعیت دشمنان: {[addr] = {positions}}
+local lastFrameTime = 0       -- زمان آخرین فریم
+local frameTimeSum = 0        -- جمع زمان فریم‌ها برای میانگین
+local frameCount = 0          -- تعداد فریم‌ها
+local avgFrameTime = 0.016    -- میانگین زمان فریم (پیش‌فرض 60FPS)
+
+-- اندازه تاریخچه موقعیت (برای محاسبه velocity)
+local POS_HISTORY_SIZE = 3    -- ذخیره ۳ فریم آخر
+
+-- آفست‌ها
+local OFF_X = 448
+local OFF_Y = 452
+local OFF_Z = 456
+local OFF_TYPE_PTR = 424
+local OFF_TYPE_VAL = 168
+local OFF_FIRE_BUTTON = 432
+
+-- =========================
+-- سیستم لاگینگ (فقط لاگ، بدون تغییر)
+-- =========================
+local LOG_ENABLED = true
+local logFile = "/sdcard/aimbot_log.txt"
+
+local function writeLog(message)
+    if not LOG_ENABLED then return end
+    local file = io.open(logFile, "a+")
+    if file then
+        local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+        file:write(string.format("[%s] %s\n", timestamp, message))
+        file:close()
+    end
+end
+
+local function clearLog()
+    local file = io.open(logFile, "w")
+    if file then
+        file:write("=== Aimbot Log Started ===\n")
+        file:close()
+    end
+end
+
+local function logSearchResults(searchType, searchValue, resultsCount)
+    local msg = string.format("🔍 جستجو: %s | مقدار: %s | تعداد نتایج: %d", 
+        searchType, tostring(searchValue), resultsCount or 0)
+    writeLog(msg)
+end
+
+local function logFoundAddress(address, value, offset, description)
+    local msg = string.format("📍 آدرس: 0x%X | مقدار: %s | آفست: %d | توضیح: %s", 
+        address, tostring(value), offset or 0, description or "")
+    writeLog(msg)
+end
+
+-- پاک کردن لاگ قبلی
+clearLog()
+writeLog("=== اسکریپت اجرا شد ===")
+
+-- =========================
+-- تنظیمات کاراکترها (با پشتیبانی از بازه‌ها)
+-- =========================
+local TYPE_AIM_HEIGHT = {
+    [0] = 1.6,  -- مقدار پیش‌فرض
+}
+
+local TYPE_NAMES = {
+    [0] = "Unknown",
+}
+
+-- بازه‌های کاراکترها (شروع، پایان، ارتفاع هدفگیری، نام)
+local TYPE_RANGES = {
+    -- victor: 30012001 ~ 30012011
+    {start = 30012001, stop = 30012011, height = 0, name = "Victor"},
+    
+    -- mark: 20012001 ~ 20012015
+    {start = 20012001, stop = 20012015, height = 0, name = "Mark"},
+}
+
+-- =========================
+-- تنظیمات اصلی و پیشرفته
+-- =========================
+local CONFIG = {
+    fov            = 30.0,
+    smooth         = 0.00,
+    maxDistance    = 9999.0,
+    minDistance    = 0.0,
+
+    invertPitch    = true,
+    invertYaw      = false,
+
+    yawOffset      = 0.0,
+    pitchOffset    = 0.0,
+
+    humanRandom    = 0.0,
+    showDebug      = false,
+
+    priorityMode   = 1, -- ANGLE
+    boneModeGlobal = 10, -- AUTO
+    customAimHeight = 1.6,
+
+    dynamicFOV     = false,
+    dynamicFOVMin  = 10,
+    dynamicFOVMax  = 60,
+    dynamicFOVDist = 40.0,
+    
+    -- تنظیمات جدید سیستم Frame-Aligned Prediction
+    predictionEnabled = true,        -- فعال‌سازی پیش‌بینی
+    predictionTime    = 0.15,       -- زمان پیش‌بینی پیش‌فرض (25ms)
+    autoPrediction    = true,        -- محاسبه خودکار زمان پیش‌بینی
+    maxPredictionTime = 0.05,        -- حداکثر زمان پیش‌بینی
+    minPredictionTime = 0.01,        -- حداقل زمان پیش‌بینی
+    
+    velocitySmoothing = 0.3,         -- هموارسازی سرعت (برای جلوگیری از نوسان)
+    
+    -- تنظیمات جدید برای بهبود دقت
+    useAcceleration  = false,        -- استفاده از شتاب برای پیش‌بینی بهتر
+    extrapolateMode  = 1,            -- 1: خطی, 2: درجه دوم
+    
+    showPredictionDebug = false,     -- نمایش اطلاعات دیباگ پیش‌بینی
+}
+
+-- =========================
+-- حالت‌های هدف‌گیری
+-- =========================
+local TARGET_MODE = {
+    ANGLE   = 1,
+    DIST    = 2,
+    HYBRID  = 3,
+}
+local BONE_MODE = {
+    AUTO   = 10,
+    HEAD   = 2,
+    CHEST  = 3,
+    CUSTOM = 0,
+}
+
+-- =========================
+-- متغیرهای وضعیت
+-- =========================
+local isAimbotActive = false
+local wallActive = false
+
+-- =========================
+-- ابزارهای کمکی
+-- =========================
+local function safeGet(vals, idx)
+    return vals and vals[idx] and vals[idx].value
+end
+
+local function clamp(v, min, max)
+    if v < min then return min end
+    if v > max then return max end
+    return v
+end
+
+-- =========================
+-- تابع‌های مدیریت بازه کاراکترها
+-- =========================
+local function initCharacterRanges()
+    -- پاک کردن جداول قدیمی
+    TYPE_AIM_HEIGHT = {[0] = 1.6}
+    TYPE_NAMES = {[0] = "Unknown"}
+    
+    -- پر کردن جداول از بازه‌ها
+    for _, range in ipairs(TYPE_RANGES) do
+        for id = range.start, range.stop do
+            TYPE_AIM_HEIGHT[id] = range.height
+            TYPE_NAMES[id] = range.name
+        end
+    end
+end
+
+-- بارگذاری اولیه بازه‌ها
+initCharacterRanges()
+
+local function addCharacterRange(startID, endID, height, name)
+    table.insert(TYPE_RANGES, {
+        start = startID,
+        stop = endID,
+        height = height or 1.6,
+        name = name or ("نوع " .. startID)
+    })
+    
+    -- به‌روزرسانی جداول
+    for id = startID, endID do
+        TYPE_AIM_HEIGHT[id] = height or 1.6
+        TYPE_NAMES[id] = name or ("نوع " .. startID)
+    end
+    
+    gg.toast(string.format("✅ بازه %s (%d-%d) اضافه شد", name or startID, startID, endID))
+    return true
+end
+
+local function removeCharacterRange(index)
+    if index < 1 or index > #TYPE_RANGES then
+        return false
+    end
+    
+    local removed = table.remove(TYPE_RANGES, index)
+    
+    -- پاک کردن از جداول
+    for id = removed.start, removed.stop do
+        TYPE_AIM_HEIGHT[id] = nil
+        TYPE_NAMES[id] = nil
+    end
+    
+    -- مقداردهی مجدد به پیش‌فرض برای IDهای حذف شده
+    for id = removed.start, removed.stop do
+        TYPE_AIM_HEIGHT[id] = TYPE_AIM_HEIGHT[0] or 1.6
+        TYPE_NAMES[id] = TYPE_NAMES[0] or "Unknown"
+    end
+    
+    gg.toast("✅ بازه " .. removed.name .. " حذف شد")
+    return true
+end
+
+-- =========================
+-- تشخیص نوع کاراکتر
+-- =========================
+local function getCharacterType(charAddr)
+    if not charAddr or charAddr == 0 then return 0 end
+    local typePtr = safeGet(gg.getValues({{address = charAddr + OFF_TYPE_PTR, flags = gg.TYPE_QWORD}}), 1)
+    if not typePtr or typePtr == 0 then return 0 end
+    return safeGet(gg.getValues({{address = typePtr + OFF_TYPE_VAL, flags = gg.TYPE_DWORD}}), 1) or 0
+end
+
+local function getDistanceSqr(px, py, pz, ex, ey, ez)
+    local dx = ex - px
+    local dy = ey - py
+    local dz = ez - pz
+    return dx*dx + dy*dy + dz*dz
+end
+
+local function getAngularDistance(cy, cp, ty, tp)
+    local yd = math.abs(ty - cy)
+    if yd > 180 then yd = 360 - yd end
+    local pd = math.abs(tp - cp)
+    return math.sqrt(yd*yd + pd*pd)
+end
+
+-- =========================
+-- محاسبات زاویه
+-- =========================
+local function calculateAngles(px, py, pz, ex, ey, ez, aimH)
+    local dx = ex - px
+    local dz = ez - pz
+    local dy = (ey + aimH) - py
+
+    if CONFIG.invertYaw then dx = -dx end
+
+    local yaw = math.deg(math.atan2(dx, dz))
+    if yaw < 0 then yaw = yaw + 360 end
+
+    local horizontal = math.sqrt(dx*dx + dz*dz)
+    if horizontal < 0.01 then horizontal = 0.01 end
+
+    local pitch = math.deg(math.atan2(dy, horizontal))
+    pitch = clamp(pitch, -89.9, 89.9)
+
+    if CONFIG.invertPitch then pitch = -pitch end
+
+    yaw = yaw + CONFIG.yawOffset
+    pitch = pitch + CONFIG.pitchOffset
+
+    return yaw, pitch
+end
+
+local function applySmoothing(cur, target, smooth)
+    if smooth <= 0 then return target end
+    local delta = target - cur
+    -- کوتاه‌ترین چرخش برای yaw
+    if math.abs(delta) > 180 then
+        if delta > 0 then
+            delta = delta - 360
+        else
+            delta = delta + 360
+        end
+    end
+    return cur + delta * clamp(smooth, 0.0, 1.0)
+end
+
+local function applyHumanRandom(angle)
+    if CONFIG.humanRandom <= 0 then return angle end
+    local r = (math.random() * 2 - 1) * CONFIG.humanRandom
+    return angle + r
+end
+
+local function getBoneAimHeight(enemy, baseY)
+    local mode = enemy.boneMode or CONFIG.boneModeGlobal
+
+    if mode == BONE_MODE.HEAD then
+        return 1.8
+    elseif mode == BONE_MODE.CHEST then
+        return 1.2
+    elseif mode == BONE_MODE.CUSTOM then
+        return CONFIG.customAimHeight
+    else
+        return TYPE_AIM_HEIGHT[enemy.type] or 1.6
+    end
+end
+
+local function getEffectiveFOV(dist)
+    if not CONFIG.dynamicFOV then
+        return CONFIG.fov
+    end
+    local d = math.sqrt(dist)
+    local t = clamp(d / CONFIG.dynamicFOVDist, 0.0, 1.0)
+    local fov = CONFIG.dynamicFOVMin + (CONFIG.dynamicFOVMax - CONFIG.dynamicFOVMin) * t
+    return fov
+end
+
+-- =========================
+-- سیستم Frame-Aligned Prediction
+-- =========================
+local function updateFrameTime()
+    local currentTime = os.clock()
+    
+    if lastFrameTime > 0 then
+        local delta = currentTime - lastFrameTime
+        frameTimeSum = frameTimeSum + delta
+        frameCount = frameCount + 1
+        
+        if frameCount >= 10 then  -- هر ۱۰ فریم میانگین بگیر
+            avgFrameTime = frameTimeSum / frameCount
+            frameTimeSum = 0
+            frameCount = 0
+            
+            -- محدود کردن به بازه معقول
+            avgFrameTime = clamp(avgFrameTime, 0.005, 0.1)  -- 5ms تا 100ms
+        end
+    end
+    
+    lastFrameTime = currentTime
+    return avgFrameTime
+end
+
+local function getPredictionTime()
+    if not CONFIG.autoPrediction then
+        return CONFIG.predictionTime
+    end
+    
+    -- محاسبه زمان پیش‌بینی بر اساس میانگین زمان فریم
+    local frameTime = avgFrameTime
+    
+    -- زمان کل: زمان فریم + تأخیر نوشتن + حاشیه امنیت
+    local totalDelay = frameTime * 2.0  -- دو فریم جلوتر
+    
+    -- محدود کردن به بازه مجاز
+    return clamp(totalDelay, CONFIG.minPredictionTime, CONFIG.maxPredictionTime)
+end
+
+local function addPositionToHistory(addr, x, y, z)
+    if not targetPosHistory[addr] then
+        targetPosHistory[addr] = {}
+    end
+    
+    local history = targetPosHistory[addr]
+    
+    -- اضافه کردن موقعیت جدید
+    table.insert(history, 1, {
+        x = x,
+        y = y,
+        z = z,
+        time = os.clock()
+    })
+    
+    -- حفظ اندازه تاریخچه
+    while #history > POS_HISTORY_SIZE do
+        table.remove(history)
+    end
+end
+
+local function calculateVelocity(history)
+    if not history or #history < 2 then
+        return 0, 0, 0
+    end
+    
+    local newest = history[1]
+    local oldest = history[#history]
+    
+    local dt = newest.time - oldest.time
+    if dt <= 0 then
+        return 0, 0, 0
+    end
+    
+    -- محاسبه سرعت (واحد در ثانیه)
+    local vx = (newest.x - oldest.x) / dt
+    local vy = (newest.y - oldest.y) / dt
+    local vz = (newest.z - oldest.z) / dt
+    
+    -- اعمال smoothing برای جلوگیری از نوسان
+    if CONFIG.velocitySmoothing > 0 then
+        if history.avgVx then
+            vx = history.avgVx * (1 - CONFIG.velocitySmoothing) + vx * CONFIG.velocitySmoothing
+            vy = history.avgVy * (1 - CONFIG.velocitySmoothing) + vy * CONFIG.velocitySmoothing
+            vz = history.avgVz * (1 - CONFIG.velocitySmoothing) + vz * CONFIG.velocitySmoothing
+        end
+        
+        history.avgVx = vx
+        history.avgVy = vy
+        history.avgVz = vz
+    end
+    
+    return vx, vy, vz
+end
+
+local function predictPosition(history, predictionTime)
+    if not history or #history < 2 then
+        return nil, nil, nil
+    end
+    
+    local current = history[1]
+    local vx, vy, vz = calculateVelocity(history)
+    
+    -- پیش‌بینی موقعیت آینده
+    local predictedX = current.x + vx * predictionTime
+    local predictedY = current.y + vy * predictionTime
+    local predictedZ = current.z + vz * predictionTime
+    
+    return predictedX, predictedY, predictedZ
+end
+
+-- =========================
+-- اسکن کاراکترها (با لاگ)
+-- =========================
+local function scanCharacters()
+    writeLog("=== شروع اسکن کاراکترها ===")
+    gg.clearResults()
+    
+    local searchValue = "0.82352942228"
+    writeLog("🔎 جستجوی عدد: " .. searchValue .. " (TYPE_FLOAT)")
+    gg.searchNumber(searchValue, gg.TYPE_FLOAT)
+    
+    local results = gg.getResults(5000)
+    local resultCount = results and #results or 0
+    logSearchResults("کاراکتر", searchValue, resultCount)
+    
+    if not results or #results == 0 then
+        writeLog("❌ هیچ نتیجه‌ای پیدا نشد!")
+        gg.alert("❌ ساختار کاراکتر پیدا نشد!")
+        return false
+    end
+
+    -- لاگ اولین ۵ نتیجه
+    for i = 1, math.min(5, #results) do
+        local v = results[i]
+        writeLog(string.format("  نتیجه %d: آدرس 0x%X | مقدار: %s", i, v.address, tostring(v.value)))
+    end
+
+    local validBases = {}
+    for i = 1, #results do
+        local v = results[i]
+        local checkAddr = v.address + 16
+        local checkVal = safeGet(gg.getValues({{address = checkAddr, flags = gg.TYPE_FLOAT}}), 1)
+        
+        writeLog(string.format("چک آدرس: 0x%X + 16 = 0x%X | مقدار: %s", 
+            v.address, checkAddr, tostring(checkVal)))
+        
+        if checkVal and math.abs(checkVal - 0.53333336115) < 0.000001 then
+            writeLog(string.format("✅ تطابق پیدا شد! آدرس: 0x%X", v.address))
+            table.insert(validBases, v.address)
+        end
+    end
+
+    writeLog("تعداد آدرس‌های معتبر: " .. #validBases)
+
+    if #validBases == 0 then 
+        writeLog("❌ هیچ آدرس معتبری پیدا نشد!")
+        return false 
+    end
+
+    for i = 1, #validBases do
+        local baseAddr = validBases[i]
+        writeLog(string.format("--- پردازش Base %d: 0x%X ---", i, baseAddr))
+        
+        -- خواندن p1Val از آدرس +40
+        local p1Val = safeGet(gg.getValues({{address = baseAddr + 40, flags = gg.TYPE_QWORD}}), 1)
+        writeLog(string.format("p1Val (base+40=0x%X): 0x%X", baseAddr + 40, p1Val or 0))
+        
+        if not p1Val or p1Val < 0x7000000000 then 
+            writeLog("❌ p1Val نامعتبر!")
+            goto continue 
+        end
+
+        -- خواندن myCharAddr از p1Val + 136
+        myCharAddr = safeGet(gg.getValues({{address = p1Val + 136, flags = gg.TYPE_QWORD}}), 1)
+        writeLog(string.format("myCharAddr (p1+136=0x%X): 0x%X", p1Val + 136, myCharAddr or 0))
+
+        -- خواندن p2Val از p1Val + 208
+        local p2Val = safeGet(gg.getValues({{address = p1Val + 208, flags = gg.TYPE_QWORD}}), 1)
+        writeLog(string.format("p2Val (p1+208=0x%X): 0x%X", p1Val + 208, p2Val or 0))
+        
+        if not p2Val or p2Val < 0x7000000000 then 
+            writeLog("❌ p2Val نامعتبر!")
+            goto continue 
+        end
+
+        -- خواندن p3Val از p2Val + 16
+        local p3Val = safeGet(gg.getValues({{address = p2Val + 16, flags = gg.TYPE_QWORD}}), 1)
+        writeLog(string.format("p3Val (p2+16=0x%X): 0x%X", p2Val + 16, p3Val or 0))
+        
+        if not p3Val or p3Val < 0x7000000000 then 
+            writeLog("❌ p3Val نامعتبر!")
+            goto continue 
+        end
+
+        local arrayBase = p3Val + 24
+        writeLog(string.format("arrayBase (p3+24=0x%X): 0x%X", p3Val + 24, arrayBase))
+        
+        enemyAddrs = {}
+        local enemyCount = 0
+
+        for j = 0, 60 do
+            local charPtrAddr = arrayBase + (j * 8)
+            local charPtr = safeGet(gg.getValues({{address = charPtrAddr, flags = gg.TYPE_QWORD}}), 1)
+            
+            if not charPtr or charPtr == 0 then 
+                writeLog(string.format("  [%d] آدرس: 0x%X | charPtr: 0 → پایان", j, charPtrAddr))
+                break 
+            end
+            
+            writeLog(string.format("  [%d] آدرس: 0x%X | charPtr: 0x%X", j, charPtrAddr, charPtr))
+            
+            if myCharAddr and charPtr == myCharAddr then 
+                writeLog("  → این کاراکتر خودمان است، رد می‌شود")
+                goto next 
+            end
+
+            local typeVal = getCharacterType(charPtr)
+            local charName = TYPE_NAMES[typeVal] or ("نوع " .. typeVal)
+            
+            writeLog(string.format("  → دشمن: %s | نوع: %d | آدرس: 0x%X", charName, typeVal, charPtr))
+            
+            table.insert(enemyAddrs, {
+                addr     = charPtr,
+                type     = typeVal,
+                name     = charName,
+                enabled  = true,
+                boneMode = BONE_MODE.AUTO,
+            })
+            enemyCount = enemyCount + 1
+
+            ::next::
+        end
+
+        writeLog(string.format("تعداد دشمنان پیدا شده: %d", enemyCount))
+
+        if myCharAddr and #enemyAddrs > 0 then
+            writeLog("✅ اسکن موفق! " .. #enemyAddrs .. " دشمن پیدا شد")
+            gg.toast("✅ " .. #enemyAddrs .. " دشمن پیدا شد (" .. #TYPE_RANGES .. " بازه فعال)")
+            currentTarget = nil
+            targetPosHistory = {}
+            return true
+        end
+
+        ::continue::
+    end
+
+    writeLog("❌ اسکن ناموفق! هیچ دشمنی پیدا نشد.")
+    return false
+end
+
+-- =========================
+-- اسکن دکمه شلیک (با لاگ)
+-- =========================
+local function scanFireButton()
+    writeLog("=== شروع اسکن دکمه شلیک ===")
+    
+    if not myCharAddr then
+        writeLog("❌ myCharAddr nil است!")
+        gg.toast("⚠️ ابتدا کاراکتر خود را اسکن کنید")
+        return false
+    end
+    
+    fireButtonAddr = myCharAddr + OFF_FIRE_BUTTON
+    writeLog(string.format("fireButtonAddr: 0x%X (myChar: 0x%X + %d)", 
+        fireButtonAddr, myCharAddr, OFF_FIRE_BUTTON))
+    
+    local testVal = safeGet(gg.getValues({{address = fireButtonAddr, flags = gg.TYPE_DWORD}}), 1)
+    writeLog(string.format("مقدار testVal: %s", tostring(testVal)))
+    
+    if testVal ~= nil then
+        lastFireState = testVal
+        writeLog("✅ دکمه شلیک پیدا شد!")
+        gg.toast("✅ آدرس دکمه شلیک پیدا شد")
+        return true
+    else
+        writeLog("❌ نتوانستم دکمه شلیک را پیدا کنم")
+        gg.toast("❌ نتوانستم دکمه شلیک را پیدا کنم")
+        fireButtonAddr = nil
+        return false
+    end
+end
+
+-- =========================
+-- اسکن دوربین (با لاگ)
+-- =========================
+local function scanCamera()
+    writeLog("=== شروع اسکن دوربین ===")
+    gg.clearResults()
+    
+    local searchValue = "-80"
+    writeLog("🔎 جستجوی عدد: " .. searchValue .. " (TYPE_FLOAT)")
+    gg.searchNumber(searchValue, gg.TYPE_FLOAT)
+    
+    local results = gg.getResults(5000)
+    local resultCount = results and #results or 0
+    logSearchResults("دوربین", searchValue, resultCount)
+    
+    if not results or #results == 0 then 
+        writeLog("❌ نتیجه‌ای برای دوربین پیدا نشد!")
+        return false 
+    end
+
+    for i = 1, math.min(10, #results) do
+        local v = results[i]
+        writeLog(string.format("نتیجه %d: آدرس 0x%X | مقدار: %s", i, v.address, tostring(v.value)))
+    end
+
+    for i = 1, #results do
+        local v = results[i]
+        local base = v.address
+        
+        local check1 = safeGet(gg.getValues({{address = base + 28, flags = gg.TYPE_FLOAT}}), 1)
+        writeLog(string.format("چک 1: 0x%X + 28 = 0x%X | مقدار: %s", base, base+28, tostring(check1)))
+        
+        if check1 and check1 == -80 then
+            local check2 = safeGet(gg.getValues({{address = base + 36, flags = gg.TYPE_FLOAT}}), 1)
+            writeLog(string.format("چک 2: 0x%X + 36 = 0x%X | مقدار: %s", base, base+36, tostring(check2)))
+            
+            if check2 and check2 == -80 then
+                pitchAddr = base
+                yawAddr = base - 4
+                writeLog(string.format("✅ دوربین پیدا شد! Pitch: 0x%X, Yaw: 0x%X", pitchAddr, yawAddr))
+                gg.toast("✅ آدرس دوربین پیدا شد")
+                return true
+            end
+        end
+    end
+    
+    writeLog("❌ دوربین پیدا نشد!")
+    return false
+end
+
+-- =========================
+-- انتخاب هدف با سیستم پیش‌بینی
+-- =========================
+local function selectBestTarget(px, py, pz, currentYaw, currentPitch)
+    local bestYaw, bestPitch = nil, nil
+    local bestScore = 1e18
+    local bestIndex = nil
+    local bestPredicted = false
+
+    local maxCheck = math.min(#enemyAddrs, 30)
+
+    for i = 1, maxCheck do
+        local e = enemyAddrs[i]
+        if not e or not e.enabled then goto continue end
+
+        local evals = gg.getValues({
+            {address = e.addr + OFF_X, flags = gg.TYPE_FLOAT},
+            {address = e.addr + OFF_Y, flags = gg.TYPE_FLOAT},
+            {address = e.addr + OFF_Z, flags = gg.TYPE_FLOAT},
+        })
+        
+        local ex = evals[1].value or 0
+        local ey = evals[2].value or 0
+        local ez = evals[3].value or 0
+
+        if ex == 0 and ey == 0 and ez == 0 then goto continue end
+        
+        -- ذخیره موقعیت در تاریخچه
+        addPositionToHistory(e.addr, ex, ey, ez)
+
+        -- انتخاب بین موقعیت فعلی یا پیش‌بینی شده
+        local targetX, targetY, targetZ = ex, ey, ez
+        local usingPrediction = false
+        
+        if CONFIG.predictionEnabled then
+            local history = targetPosHistory[e.addr]
+            local predictionTime = getPredictionTime()
+            
+            local predictedX, predictedY, predictedZ = predictPosition(history, predictionTime)
+            if predictedX then
+                targetX, targetY, targetZ = predictedX, predictedY, predictedZ
+                usingPrediction = true
+            end
+        end
+
+        local distSqr = getDistanceSqr(px, py, pz, targetX, targetY, targetZ)
+
+        if distSqr < CONFIG.minDistance * CONFIG.minDistance or
+           distSqr > CONFIG.maxDistance * CONFIG.maxDistance then
+            goto continue
+        end
+
+        local aimH = getBoneAimHeight(e, targetY)
+        local yaw, pitch = calculateAngles(px, py, pz, targetX, targetY, targetZ, aimH)
+
+        local angleDist = getAngularDistance(currentYaw, currentPitch, yaw, pitch)
+        local effectiveFOV = getEffectiveFOV(distSqr)
+
+        if angleDist <= effectiveFOV then
+            local score
+            if CONFIG.priorityMode == TARGET_MODE.ANGLE then
+                score = angleDist
+            elseif CONFIG.priorityMode == TARGET_MODE.DIST then
+                score = distSqr
+            else -- HYBRID
+                score = distSqr * 0.7 + angleDist * 0.3
+            end
+            
+            -- اولویت به هدفی که از پیش‌بینی استفاده می‌کند
+            if usingPrediction then
+                score = score * 0.5  -- نمره بهتر
+            end
+
+            if score < bestScore then
+                bestScore = score
+                bestYaw = yaw
+                bestPitch = pitch
+                bestIndex = i
+                bestPredicted = usingPrediction
+            end
+        end
+
+        ::continue::
+    end
+
+    return bestYaw, bestPitch, bestIndex, bestPredicted
+end
+
+-- =========================
+-- AIMBOT با سیستم Frame-Aligned
+-- =========================
+function aimbotLoop()
+    -- به‌روزرسانی زمان فریم
+    updateFrameTime()
+    
+    if not isAimbotActive or not myCharAddr or not yawAddr or not pitchAddr then return end
+    
+    -- بررسی دکمه شلیک
+    local firePressed = false
+    if fireToggleActive and fireButtonAddr then
+        local fireState = safeGet(gg.getValues({{address = fireButtonAddr, flags = gg.TYPE_DWORD}}), 1)
+        if fireState ~= nil then
+            firePressed = (fireState == 0)
+            lastFireState = fireState
+        end
+    else
+        firePressed = true
+    end
+    
+    if not firePressed then
+        currentTarget = nil
+        return
+    end
+    
+    -- خواندن موقعیت خودمان و دوربین
+    local vals = gg.getValues({
+        {address = myCharAddr + OFF_X, flags = gg.TYPE_FLOAT},
+        {address = myCharAddr + OFF_Y, flags = gg.TYPE_FLOAT},
+        {address = myCharAddr + OFF_Z, flags = gg.TYPE_FLOAT},
+        {address = yawAddr, flags = gg.TYPE_FLOAT},
+        {address = pitchAddr, flags = gg.TYPE_FLOAT},
+    })
+
+    local px = vals[1].value or 0
+    local py = vals[2].value or 0
+    local pz = vals[3].value or 0
+    local currentYaw = vals[4].value or 0
+    local currentPitch = vals[5].value or 0
+    
+    -- انتخاب بهترین هدف
+    local bestYaw, bestPitch, targetIndex, usingPrediction = 
+        selectBestTarget(px, py, pz, currentYaw, currentPitch)
+    
+    if not bestYaw then 
+        currentTarget = nil
+        return 
+    end
+    
+    -- ذخیره هدف فعلی
+    local targetEnemy = enemyAddrs[targetIndex]
+    currentTarget = {
+        index = targetIndex,
+        addr = targetEnemy.addr,
+        name = targetEnemy.name,
+        predicted = usingPrediction
+    }
+
+    -- اعمال smoothing
+    local finalYaw   = applySmoothing(currentYaw, bestYaw, CONFIG.smooth)
+    local finalPitch = applySmoothing(currentPitch, bestPitch, CONFIG.smooth)
+
+    -- لرزش انسانی
+    finalYaw   = applyHumanRandom(finalYaw)
+    finalPitch = applyHumanRandom(finalPitch)
+
+    -- نوشتن زوایا
+    gg.setValues({
+        {address = yawAddr, flags = gg.TYPE_FLOAT, value = finalYaw},
+        {address = pitchAddr, flags = gg.TYPE_FLOAT, value = finalPitch},
+    })
+
+    -- نمایش دیباگ
+    if CONFIG.showPredictionDebug then
+        local debugMsg = "🎯 Target: " .. targetEnemy.name
+        if usingPrediction then
+            debugMsg = debugMsg .. " (Predicted)"
+        end
+        debugMsg = debugMsg .. "\nFrame: " .. string.format("%.1f", avgFrameTime * 1000) .. "ms"
+        debugMsg = debugMsg .. "\nPredTime: " .. string.format("%.3f", getPredictionTime() * 1000) .. "ms"
+        gg.toast(debugMsg, false)
+    end
+end
+
+-- =========================
+-- WallHack
+-- =========================
+local function applyWallHack()
+    if not wallActive or #enemyAddrs == 0 then return end
+    local t = {}
+    for i = 1, #enemyAddrs do
+        local e = enemyAddrs[i]
+        t[#t+1] = {address = e.addr + 392, flags = gg.TYPE_DWORD, value = 0}
+        t[#t+1] = {address = e.addr + 480, flags = gg.TYPE_DWORD, value = 65536}
+    end
+    gg.setValues(t)
+end
+
+-- =========================
+-- منوهای تنظیمات
+-- =========================
+local function menuPredictionSettings()
+    local choice = gg.choice({
+        (CONFIG.predictionEnabled and "🔴 غیرفعال‌سازی پیش‌بینی" or "🟢 فعال‌سازی پیش‌بینی"),
+        (CONFIG.autoPrediction and "⏱ زمان پیش‌بینی خودکار" or "⏱ زمان پیش‌بینی دستی"),
+        "🎯 زمان پیش‌بینی (میلی‌ثانیه): " .. (CONFIG.predictionTime * 1000),
+        "📊 تنظیمات هموارسازی سرعت: " .. CONFIG.velocitySmoothing,
+        "📈 نمایش دیباگ پیش‌بینی: " .. (CONFIG.showPredictionDebug and "روشن" or "خاموش"),
+        "🔙 بازگشت"
+    }, nil, "تنظیمات سیستم پیش‌بینی Frame-Aligned")
+    
+    if choice == 1 then
+        CONFIG.predictionEnabled = not CONFIG.predictionEnabled
+        gg.toast("پیش‌بینی: " .. (CONFIG.predictionEnabled and "فعال" or "غیرفعال"))
+    elseif choice == 2 then
+        CONFIG.autoPrediction = not CONFIG.autoPrediction
+        gg.toast("زمان پیش‌بینی: " .. (CONFIG.autoPrediction and "خودکار" or "دستی"))
+    elseif choice == 3 then
+        local p = gg.prompt({"زمان پیش‌بینی (میلی‌ثانیه):"}, 
+                           {CONFIG.predictionTime * 1000}, {"number"})
+        if p then
+            CONFIG.predictionTime = clamp((tonumber(p[1]) or 25) / 1000, 0.01, 0.1)
+            gg.toast("زمان پیش‌بینی تنظیم شد: " .. (CONFIG.predictionTime * 1000) .. "ms")
+        end
+    elseif choice == 4 then
+        local p = gg.prompt({"میزان هموارسازی سرعت (0-1):"}, 
+                           {CONFIG.velocitySmoothing}, {"number"})
+        if p then
+            CONFIG.velocitySmoothing = clamp(tonumber(p[1]) or 0.3, 0, 1)
+            gg.toast("هموارسازی تنظیم شد: " .. CONFIG.velocitySmoothing)
+        end
+    elseif choice == 5 then
+        CONFIG.showPredictionDebug = not CONFIG.showPredictionDebug
+        gg.toast("دیباگ پیش‌بینی: " .. (CONFIG.showPredictionDebug and "روشن" or "خاموش"))
+    end
+end
+
+-- منوی مدیریت بازه‌های کاراکتر
+local function menuCharacterRanges()
+    local options = {}
+    
+    -- افزودن گزینه‌ها
+    table.insert(options, "➕ افزودن بازه جدید")
+    table.insert(options, "📋 لیست بازه‌های فعلی")
+    if #TYPE_RANGES > 0 then
+        table.insert(options, "🗑️ حذف بازه")
+    end
+    table.insert(options, "🔄 بارگذاری مجدد")
+    table.insert(options, "🔙 بازگشت")
+    
+    local choice = gg.choice(options, nil, "مدیریت بازه‌های کاراکتر (" .. #TYPE_RANGES .. " بازه)")
+    
+    if choice == 1 then
+        -- افزودن بازه جدید
+        local inputs = gg.prompt({
+            "شروع بازه ID:",
+            "پایان بازه ID:",
+            "ارتفاع هدفگیری (متر):",
+            "نام نمایشی:"
+        }, {"30012001", "30012011", "1.6", "New Character"}, {"number", "number", "number", "text"})
+        
+        if inputs then
+            local startID = tonumber(inputs[1])
+            local endID = tonumber(inputs[2])
+            local height = tonumber(inputs[3])
+            local name = inputs[4]
+            
+            if startID and endID and startID <= endID then
+                addCharacterRange(startID, endID, height, name)
+            else
+                gg.alert("❌ مقادیر نامعتبر! مطمئن شوید شروع کمتر یا مساوی پایان است.")
+            end
+        end
+        
+    elseif choice == 2 then
+        -- نمایش لیست بازه‌ها
+        if #TYPE_RANGES == 0 then
+            gg.alert("📭 هیچ بازه‌ای تعریف نشده است.")
+        else
+            local list = "📋 لیست بازه‌های کاراکتر:\n\n"
+            for i, range in ipairs(TYPE_RANGES) do
+                list = list .. string.format("%d. %s\n   ID: %d ~ %d\n   ارتفاع: %.1f\n\n", 
+                    i, range.name, range.start, range.stop, range.height)
+            end
+            gg.alert(list)
+        end
+        
+    elseif choice == 3 then
+        -- حذف بازه
+        if #TYPE_RANGES == 0 then return end
+        
+        local rangeNames = {}
+        for i, range in ipairs(TYPE_RANGES) do
+            table.insert(rangeNames, string.format("%d. %s (%d-%d)", 
+                i, range.name, range.start, range.stop))
+        end
+        table.insert(rangeNames, "❌ انصراف")
+        
+        local delChoice = gg.choice(rangeNames, nil, "حذف کدام بازه؟")
+        
+        if delChoice and delChoice <= #TYPE_RANGES then
+            local confirm = gg.alert("آیا مطمئنید می‌خواهید بازه " .. 
+                TYPE_RANGES[delChoice].name .. " را حذف کنید؟", "✅ بله", "❌ خیر")
+            
+            if confirm == 1 then
+                removeCharacterRange(delChoice)
+            end
+        end
+        
+    elseif choice == 4 then
+        -- بارگذاری مجدد
+        initCharacterRanges()
+        gg.toast("✅ بازه‌ها بارگذاری مجدد شدند")
+        
+    end
+end
+
+-- منوی اصلی
+local function showMenu()
+    local statusAim = isAimbotActive and "🟢 فعال" or "🔴 خاموش"
+    local statusWall = wallActive and "🟢 فعال" or "🔴 خاموش"
+    local statusFire = fireToggleActive and "🟢 فعال" or "🔴 خاموش"
+    local statusPred = CONFIG.predictionEnabled and "🟢 فعال" or "🔴 خاموش"
+    
+    local choice = gg.choice({
+        "🔍 اسکن دوباره (کاراکتر + دوربین + دکمه شلیک)",
+        "🎯 ایم‌بات " .. statusAim,
+        "🧱 وال‌هاک " .. statusWall,
+        "🎮 حالت دکمه شلیک " .. statusFire,
+        "⚡ سیستم Frame-Aligned Prediction " .. statusPred,
+        "👤 مدیریت بازه‌های کاراکتر",
+        "⚙️ تنظیمات پیشرفته",
+        "❌ خروج"
+    }, nil, "🎯 Aimbot Frame-Aligned (Zero Lag) - " .. #TYPE_RANGES .. " بازه")
+    
+    return choice
+end
+
+-- منوی تنظیمات پیشرفته
+local function menuAdvancedSettings()
+    local choice = gg.choice({
+        "📐 FOV: " .. CONFIG.fov .. "°",
+        "🌀 Smoothing: " .. CONFIG.smooth,
+        "🎯 Priority Mode: " .. 
+            (CONFIG.priorityMode == TARGET_MODE.ANGLE and "Angle" or
+             CONFIG.priorityMode == TARGET_MODE.DIST and "Distance" or "Hybrid"),
+        "👤 Bone Mode: " .. 
+            (CONFIG.boneModeGlobal == BONE_MODE.AUTO and "Auto" or
+             CONFIG.boneModeGlobal == BONE_MODE.HEAD and "Head" or
+             CONFIG.boneModeGlobal == BONE_MODE.CHEST and "Chest" or "Custom"),
+        "📏 Custom Aim Height: " .. CONFIG.customAimHeight .. "m",
+        "🎯 Offset (Yaw/Pitch): " .. CONFIG.yawOffset .. "/" .. CONFIG.pitchOffset,
+        "🔄 Invert (Pitch/Yaw): " .. (CONFIG.invertPitch and "Yes" or "No") .. "/" .. 
+                                   (CONFIG.invertYaw and "Yes" or "No"),
+        "📊 Dynamic FOV: " .. (CONFIG.dynamicFOV and "On" or "Off"),
+        "🔙 بازگشت"
+    }, nil, "تنظیمات پیشرفته")
+    
+    if choice == 1 then
+        local p = gg.prompt({"FOV (درجه):"}, {CONFIG.fov}, {"number"})
+        if p then CONFIG.fov = clamp(tonumber(p[1]) or 30, 1, 360) end
+    elseif choice == 2 then
+        local p = gg.prompt({"Smoothing (0-1):"}, {CONFIG.smooth}, {"number"})
+        if p then CONFIG.smooth = clamp(tonumber(p[1]) or 0, 0, 1) end
+    elseif choice == 3 then
+        CONFIG.priorityMode = CONFIG.priorityMode + 1
+        if CONFIG.priorityMode > 3 then CONFIG.priorityMode = 1 end
+        gg.toast("Priority: " .. 
+            (CONFIG.priorityMode == TARGET_MODE.ANGLE and "Angle" or
+             CONFIG.priorityMode == TARGET_MODE.DIST and "Distance" or "Hybrid"))
+    elseif choice == 4 then
+        CONFIG.boneModeGlobal = CONFIG.boneModeGlobal + 1
+        if CONFIG.boneModeGlobal > 10 then CONFIG.boneModeGlobal = 0 end
+        gg.toast("Bone Mode: " .. 
+            (CONFIG.boneModeGlobal == BONE_MODE.AUTO and "Auto" or
+             CONFIG.boneModeGlobal == BONE_MODE.HEAD and "Head" or
+             CONFIG.boneModeGlobal == BONE_MODE.CHEST and "Chest" or "Custom"))
+    elseif choice == 5 then
+        local p = gg.prompt({"Custom Aim Height (متر):"}, {CONFIG.customAimHeight}, {"number"})
+        if p then CONFIG.customAimHeight = clamp(tonumber(p[1]) or 1.6, 0, 3) end
+    elseif choice == 6 then
+        local p = gg.prompt({"Yaw Offset:", "Pitch Offset:"}, 
+                           {CONFIG.yawOffset, CONFIG.pitchOffset}, {"number", "number"})
+        if p then
+            CONFIG.yawOffset = tonumber(p[1]) or 0
+            CONFIG.pitchOffset = tonumber(p[2]) or 0
+        end
+    elseif choice == 7 then
+        CONFIG.invertPitch = not CONFIG.invertPitch
+        CONFIG.invertYaw = not CONFIG.invertYaw
+        gg.toast("Invert: Pitch=" .. (CONFIG.invertPitch and "Yes" or "No") .. 
+                ", Yaw=" .. (CONFIG.invertYaw and "Yes" or "No"))
+    elseif choice == 8 then
+        CONFIG.dynamicFOV = not CONFIG.dynamicFOV
+        gg.toast("Dynamic FOV: " .. (CONFIG.dynamicFOV and "On" or "Off"))
+    end
+end
+
+-- =========================
+-- اجرای اصلی
+-- =========================
+math.randomseed(os.time())
+gg.toast("🎯 Aimbot Frame-Aligned فعال شد - Zero Lag")
+
+-- اسکن اولیه
+writeLog("=== شروع اسکن اولیه ===")
+local scanned = scanCharacters()
+if scanned then
+    scanCamera()
+    scanFireButton()
+    applyWallHack()
+    writeLog("✅ اسکن اولیه کامل شد!")
+    gg.toast("✅ آماده! " .. #TYPE_RANGES .. " بازه کاراکتر فعال")
+end
+writeLog("=== اسکریپت آماده اجرا است ===")
+
+while true do
+    if gg.isVisible() then
+        gg.setVisible(false)
+        local choice = showMenu()
+        
+        if choice == 1 then
+            writeLog("=== اسکن مجدد درخواست شد ===")
+            local success1 = scanCharacters()
+            local success2 = scanCamera()
+            local success3 = false
+            
+            if success1 then
+                success3 = scanFireButton()
+            end
+            
+            if success1 and success2 then
+                applyWallHack()
+                writeLog("✅ اسکن مجدد کامل شد!")
+                gg.toast("✅ اسکن کامل! سیستم آماده")
+            end
+            
+        elseif choice == 2 then
+            isAimbotActive = not isAimbotActive
+            writeLog("ایم‌بات: " .. (isAimbotActive and "فعال" or "غیرفعال"))
+            gg.toast(isAimbotActive and "🎯 ایم‌بات فعال" or "⏹️ ایم‌بات خاموش")
+            
+        elseif choice == 3 then
+            wallActive = not wallActive
+            if wallActive then
+                applyWallHack()
+                writeLog("وال‌هاک فعال شد")
+                gg.toast("🧱 وال‌هاک فعال")
+            else
+                writeLog("وال‌هاک غیرفعال شد")
+            end
+            
+        elseif choice == 4 then
+            fireToggleActive = not fireToggleActive
+            writeLog("دکمه شلیک: " .. (fireToggleActive and "فعال" or "غیرفعال"))
+            gg.toast("دکمه شلیک: " .. (fireToggleActive and "فعال" or "غیرفعال"))
+            
+        elseif choice == 5 then
+            menuPredictionSettings()
+            
+        elseif choice == 6 then
+            menuCharacterRanges()
+            
+        elseif choice == 7 then
+            menuAdvancedSettings()
+            
+        elseif choice == 8 then
+            writeLog("=== اسکریپت بسته شد ===")
+            gg.toast("خداحافظ!")
+            os.exit()
+        end
+    end
+    
+    if isAimbotActive then
+        aimbotLoop()
+    end
+    
+    gg.sleep(1)  -- تاخیر کوچک برای پایداری
+end
